@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Oyuncu Profili</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <div class="logo-area" onclick="window.location.href='index.html'" style="cursor:pointer;">
+        <span>⚽</span> EDITOR LEAGUE DB
+    </div>
+</header>
+
+<div class="container">
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 40px; border-radius: 4px; display: flex; gap: 30px; align-items: center; border-left: 5px solid var(--accent-yellow);">
+        <div style="font-size: 64px;">🏃‍♂️</div>
+        <div>
+            <h1 id="oyuncuAdi" style="font-size: 36px; font-weight: 800;">Oyuncu Adı</h1>
+            <p id="oyuncuTakim" style="color: var(--accent-blue); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Takım Bilgisi</p>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 40px; margin-bottom: 20px;">Sezon Performansı</h3>
+    <div class="database-grid">
+        <div class="db-card matches" style="text-align: center; padding: 20px;">
+            <p>Goller</p>
+            <h2 id="pGol" style="font-size: 36px; color: var(--text-main);">0</h2>
+        </div>
+        <div class="db-card leagues" style="text-align: center; padding: 20px;">
+            <p>Asistler</p>
+            <h2 id="pAsist" style="font-size: 36px; color: var(--text-main);">0</h2>
+        </div>
+        <div class="db-card teams" style="text-align: center; padding: 20px;">
+            <p>Ortalama Reyting</p>
+            <h2 id="pReyting" style="font-size: 36px; color: var(--accent-yellow);">0.0</h2>
+        </div>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const oyuncuId = urlParams.get('id');
+
+    async function oyuncuDetayGetir() {
+        if(!oyuncuId) return;
+        
+        // Render API'nden sadece bu oyuncunun datasını çekiyoruz
+        try {
+            const response = await fetch(`https://senin-render-linkin.onrender.com/api/oyuncu/${oyuncuId}`);
+            const oyuncu = await response.json();
+
+            document.getElementById('oyuncuAdi').innerText = oyuncu.isim;
+            document.getElementById('oyuncuTakim').innerText = oyuncu.takim;
+            document.getElementById('pGol').innerText = oyuncu.gol;
+            document.getElementById('pAsist').innerText = oyuncu.asist;
+            document.getElementById('pReyting').innerText = oyuncu.reyting.toFixed(2);
+        } catch (error) {
+            console.error("Oyuncu verisi çekilemedi.");
+        }
+    }
+
+    window.onload = oyuncuDetayGetir;
+</script>
+</body>
+</html>
