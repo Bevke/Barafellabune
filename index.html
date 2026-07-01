@@ -3,336 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor League - Ana Hub</title>
-    <!-- Tailwind CSS ve FontAwesome İkonları -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #0d0f14;
-            color: #e2e8f0;
-        }
-        .cyber-title {
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #151922;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #2563eb;
-            border-radius: 3px;
-        }
-    </style>
+    <title>Editor League | Hub</title>
+
+    <meta property="og:title" content="⚡ Editor League | Resmi Hub ve Canlı İstatistikler" />
+    <meta property="og:description" content="Editor League heyecanı burada! Puan durumu, gol/asist krallıkları, oyuncu kıyaslama motoru ve takım logoları ile canlı hub sistemi." />
+    <meta property="og:url" content="https://bevke.github.io/editorleague/" />
+    <meta property="og:image" content="https://media.discordapp.net/attachments/1340735808319131678/1516924176714436618/lig_pp.png" /> 
+    <meta name="theme-color" content="#38bdf8" />
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
-<body class="min-h-screen custom-scrollbar">
+<body>
 
-    <!-- Üst Menü / Navbar -->
-    <nav class="bg-[#111622] border-b border-gray-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-trophy text-yellow-500 text-2xl animate-pulse"></i>
-                    <span class="cyber-title text-xl font-bold tracking-wider bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text text-transparent">EDITOR LEAGUE</span>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="index.html" class="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-chart-simple mr-1"></i> Panel</a>
-                    <a href="oyuncu.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-users mr-1"></i> Oyuncu Profili</a>
-                    <a href="mac-detay.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-file-invoice mr-1"></i> Maç Detayları</a>
-                </div>
-            </div>
+<header>
+    <div class="logo-area" onclick="window.location.href='index.html'" style="cursor:pointer;">
+        <span>⚽</span> EDITOR LEAGUE DB
+    </div>
+    <div class="nav-links">
+        <a href="index.html" class="active">Panel</a>
+        <a href="oyuncu.html">Oyuncu Profili</a>
+        <a href="mac-detay.html">Maç Detayları</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="database-grid">
+        <div class="db-card matches">
+            <p>Oynanan Toplam Maç</p>
+            <h3 id="totalMatchesCount">0</h3>
         </div>
-    </nav>
+        <div class="db-card players">
+            <p>Kayıtlı Aktif Oyuncu</p>
+            <h3 id="totalPlayersCount">0</h3>
+        </div>
+        <div class="db-card leagues">
+            <p>Lig Lideri</p>
+            <h3 id="currentLeaderName">Yükleniyor...</h3>
+        </div>
+    </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 40px; align-items: start;">
         
-        <!-- Üst İstatistik Özet Kartları -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Toplam Aktif Oyuncu</p>
-                    <h3 id="total-players" class="text-3xl font-bold text-blue-500 mt-1">0</h3>
-                </div>
-                <i class="fa-solid fa-user-shield text-3xl text-blue-900/50"></i>
-            </div>
-            <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Oynanan Toplam Maç</p>
-                    <h3 id="total-matches" class="text-3xl font-bold text-green-500 mt-1">0</h3>
-                </div>
-                <i class="fa-solid fa-gamepad text-3xl text-green-900/50"></i>
-            </div>
-            <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 flex items-center justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Lig Lideri</p>
-                    <h3 id="league-leader" class="text-xl font-bold text-yellow-500 mt-1">Yükleniyor...</h3>
-                </div>
-                <i class="fa-solid fa-crown text-3xl text-yellow-900/50"></i>
-            </div>
+        <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: 4px;">
+            <h3 style="margin-bottom: 20px; color: var(--accent-blue); font-size: 18px; text-transform: uppercase; letter-spacing: 1px;">Canlı Puan Durumu</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: center; width: 50px;">#</th>
+                        <th>Takım</th>
+                        <th style="text-align: center;">O</th>
+                        <th style="text-align: center;">G</th>
+                        <th style="text-align: center;">B</th>
+                        <th style="text-align: center;">M</th>
+                        <th style="text-align: center;">AG</th>
+                        <th style="text-align: center;">YG</th>
+                        <th style="text-align: center;">AV</th>
+                        <th style="text-align: center; color: var(--accent-blue);">P</th>
+                    </tr>
+                </thead>
+                <tbody id="puanDurumuBody">
+                    </tbody>
+            </table>
         </div>
 
-        <!-- Alt Bölüm: Puan Durumu ve Oyuncu Listesi -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Puan Durumu (Genişlik: 2 Kolon) -->
-            <div class="lg:col-span-2 bg-[#151922] p-6 rounded-xl border border-gray-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                    <h2 class="cyber-title text-lg font-bold text-gray-200"><i class="fa-solid fa-list-ol text-blue-500 mr-2"></i> Canlı Puan Durumu</h2>
-                    <span class="text-xs bg-blue-900/40 text-blue-400 px-2.5 py-1 rounded-full font-mono">RENDER DB</span>
-                </div>
-                <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-gray-800 text-gray-400 text-xs uppercase font-mono tracking-wider">
-                                <th class="py-3 px-4 text-center w-12">#</th>
-                                <th class="py-3 px-4">Takım Adı</th>
-                                <th class="py-3 px-3 text-center">O</th>
-                                <th class="py-3 px-3 text-center">G</th>
-                                <th class="py-3 px-3 text-center">B</th>
-                                <th class="py-3 px-3 text-center">M</th>
-                                <th class="py-3 px-3 text-center">AG</th>
-                                <th class="py-3 px-3 text-center">YG</th>
-                                <th class="py-3 px-3 text-center">AV</th>
-                                <th class="py-3 px-4 text-center text-blue-400">P</th>
-                            </tr>
-                        </thead>
-                        <tbody id="puan-durumu-rows" class="divide-y divide-gray-800/50 text-sm text-gray-300">
-                            <!-- JS ile Dinamik Dolacak -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Gol / Asist Krallığı (Genişlik: 1 Kolon) -->
-            <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 space-y-6">
-                <div>
-                    <h2 class="cyber-title text-lg font-bold text-gray-200 border-b border-gray-800 pb-3"><i class="fa-solid fa-fire text-orange-500 mr-2"></i> Gol Krallığı</h2>
-                    <div id="gol-kralligi-list" class="mt-4 space-y-3">
-                        <!-- JS ile Dinamik Dolacak -->
+        <div style="display: flex; flex-direction: column; gap: 30px;">
+            <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: 4px;">
+                <h3 style="margin-bottom: 15px; color: var(--accent-red); font-size: 16px; text-transform: uppercase;">⚽ Gol Krallığı</h3>
+                <div id="golKralligiList" style="display: flex; flex-direction: column; gap: 10px;">
                     </div>
-                </div>
-                <div>
-                    <h2 class="cyber-title text-lg font-bold text-gray-200 border-b border-gray-800 pb-3"><i class="fa-solid fa-magic text-purple-500 mr-2"></i> Asist Krallığı</h2>
-                    <div id="asist-kralligi-list" class="mt-4 space-y-3">
-                        <!-- JS ile Dinamik Dolacak -->
+            </div>
+
+            <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: 4px;">
+                <h3 style="margin-bottom: 15px; color: var(--accent-purple); font-size: 16px; text-transform: uppercase;">🎯 Asist Krallığı</h3>
+                <div id="asistKralligiList" style="display: flex; flex-direction: column; gap: 10px;">
                     </div>
-                </div>
             </div>
         </div>
 
-        <!-- OYUNCU KIYASLAMA MOTORU (YENİ EKLEME) -->
-        <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 space-y-6">
-            <div class="border-b border-gray-800 pb-3">
-                <h2 class="cyber-title text-lg font-bold text-gray-200"><i class="fa-solid fa-code-compare text-indigo-500 mr-2"></i> Oyuncu Karşılaştırma Laboratuvarı</h2>
-                <p class="text-xs text-gray-400 mt-1">İki oyuncunun tüm detaylı lig istatistiklerini kafa kafaya analiz et.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs text-gray-400 font-mono mb-2">1. OYUNCU SEÇ</label>
-                    <select id="compare-select-1" class="w-full bg-[#1b202e] border border-gray-700 rounded-lg p-2.5 text-gray-300 focus:outline-none focus:border-blue-500">
-                        <option value="">Oyuncu Seçiniz...</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 font-mono mb-2">2. OYUNCU SEÇ</label>
-                    <select id="compare-select-2" class="w-full bg-[#1b202e] border border-gray-700 rounded-lg p-2.5 text-gray-300 focus:outline-none focus:border-blue-500">
-                        <option value="">Oyuncu Seçiniz...</option>
-                    </select>
-                </div>
-            </div>
+    </div>
 
-            <!-- Karşılaştırma Sonuç Matrisi -->
-            <div id="compare-matrix" class="hidden bg-[#111622] rounded-xl p-4 border border-gray-800 overflow-hidden">
-                <div class="grid grid-cols-3 text-center border-b border-gray-800 pb-2 mb-2 font-mono text-xs text-gray-400">
-                    <div id="p1-title" class="font-bold text-blue-400 text-sm">Oyuncu 1</div>
-                    <div class="text-gray-500 font-bold">KATEGORİ</div>
-                    <div id="p2-title" class="font-bold text-indigo-400 text-sm">Oyuncu 2</div>
-                </div>
-                <div id="compare-stats-container" class="space-y-2 text-sm">
-                    <!-- JS Stat Satırları -->
-                </div>
-            </div>
+    <div style="margin-top: 50px; background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 30px; border-radius: 4px;">
+        <h3 style="color: var(--accent-yellow); margin-bottom: 20px; text-transform: uppercase;">👥 OYUNCU KIYASLAMA MOTORU</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <select id="compareSelect1" class="search-input" style="width: 100%; background:#1c2035; color:#fff; border:1px solid var(--border-color); padding:10px;">
+                <option value="">1. Oyuncuyu Seç...</option>
+            </select>
+            <select id="compareSelect2" class="search-input" style="width: 100%; background:#1c2035; color:#fff; border:1px solid var(--border-color); padding:10px;">
+                <option value="">2. Oyuncuyu Seç...</option>
+            </select>
         </div>
 
-    </main>
+        <div id="compareResultMatrix" style="display: none; background: #0b0c10; border: 1px solid var(--border-color); padding: 20px; border-radius: 4px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; font-weight: bold; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px;">
+                <div id="p1Name" style="color: var(--accent-blue);">Oyuncu 1</div>
+                <div style="color: var(--text-muted);">İSTATİSTİK</div>
+                <div id="p2Name" style="color: var(--accent-purple);">Oyuncu 2</div>
+            </div>
+            <div id="compareRows" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+    </div>
+</div>
 
-    <script>
-        const API_URL = 'https://bot-lhr2.onrender.com/api/puan-durumu';
-        let globalData = null;
+<script>
+    const API_URL = 'https://bot-lhr2.onrender.com/api/puan-durumu';
+    let localData = null;
 
-        async function init() {
-            try {
-                const res = await fetch(API_URL);
-                globalData = await res.json();
-                
-                renderDashboard(globalData);
-                setupComparison(globalData.oyuncular);
-            } catch (err) {
-                console.error("Veri yüklenirken hata oluştu:", err);
-                document.getElementById('league-leader').innerText = "Hata oluştu.";
-            }
-        }
-
-        function renderDashboard(data) {
-            // İstatistik Sayıcıları
-            const totalPlayers = Object.keys(data.oyuncular || {}).length;
-            document.getElementById('total-players').innerText = totalPlayers;
+    async function verileriYukle() {
+        try {
+            const res = await fetch(API_URL);
+            localData = await res.json();
             
-            const totalMatches = Array.isArray(data.maclar) ? data.maclar.length : (data.maclar ? Object.keys(data.maclar).length : 0);
-            document.getElementById('total-matches').innerText = totalMatches;
+            // Üst Sayaçlar
+            document.getElementById('totalMatchesCount').innerText = localData.maclar ? localData.maclar.length : 0;
+            const oyuncuSayisi = localData.oyuncular ? Object.keys(localData.oyuncular).length : 0;
+            document.getElementById('totalPlayersCount').innerText = oyuncuSayisi;
 
-            // Takımları Dönüştür ve Sırala
-            let takimlarList = [];
-            if (data.takimlar && typeof data.takimlar === 'object') {
-                takimlarList = Object.entries(data.takimlar).map(([name, stats]) => ({
-                    name, ...stats
+            // Puan Durumu Listeleme
+            let takimlarDizisi = [];
+            if(localData.takimlar) {
+                takimlarDizisi = Object.entries(localData.takimlar).map(([isim, veri]) => ({
+                    isim, ...veri
                 }));
             }
-            takimlarList.sort((a, b) => b.P - a.P || b.averaj - a.averaj);
+            // Puan, ardından averaj sırası
+            takimlarDizisi.sort((a,b) => b.P - a.P || b.averaj - a.averaj);
 
-            if(takimlarList.length > 0) {
-                document.getElementById('league-leader').innerText = takimlarList[0].name;
+            if(takimlarDizisi.length > 0) {
+                document.getElementById('currentLeaderName').innerText = takimlarDizisi[0].isim;
             }
 
-            // Puan Durumu Tablosu Basımı
-            const tbody = document.getElementById('puan-durumu-rows');
-            tbody.innerHTML = '';
-            takimlarList.forEach((t, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-800/30 transition-colors";
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4 text-center font-mono text-gray-500 font-bold">${index + 1}</td>
-                    <td class="py-3.5 px-4 font-semibold text-gray-200">${t.name}</td>
-                    <td class="py-3.5 px-3 text-center font-mono">${t.O || 0}</td>
-                    <td class="py-3.5 px-3 text-center font-mono text-green-400">${t.G || 0}</td>
-                    <td class="py-3.5 px-3 text-center font-mono text-gray-400">${t.B || 0}</td>
-                    <td class="py-3.5 px-3 text-center font-mono text-red-400">${t.M || 0}</td>
-                    <td class="py-3.5 px-3 text-center font-mono text-gray-400">${t.AG || 0}</td>
-                    <td class="py-3.5 px-3 text-center font-mono text-gray-400">${t.YG || 0}</td>
-                    <td class="py-3.5 px-3 text-center font-mono ${t.averaj >= 0 ? 'text-green-500' : 'text-red-500'}">${t.averaj >= 0 ? '+' : ''}${t.averaj || 0}</td>
-                    <td class="py-3.5 px-4 text-center font-bold font-mono text-blue-400 text-base bg-blue-500/5">${t.P || 0}</td>
+            const tableBody = document.getElementById('puanDurumuBody');
+            tableBody.innerHTML = '';
+            takimlarDizisi.forEach((t, i) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center; font-weight: bold; color: var(--text-muted);">${i+1}</td>
+                        <td style="font-weight: 600;">${t.isim}</td>
+                        <td style="text-align: center;">${t.O || 0}</td>
+                        <td style="text-align: center; color: #4cd137;">${t.G || 0}</td>
+                        <td style="text-align: center;">${t.B || 0}</td>
+                        <td style="text-align: center; color: var(--accent-red);">${t.M || 0}</td>
+                        <td style="text-align: center;">${t.AG || 0}</td>
+                        <td style="text-align: center;">${t.YG || 0}</td>
+                        <td style="text-align: center; font-weight: bold;">${t.averaj >= 0 ? '+' : ''}${t.averaj || 0}</td>
+                        <td style="text-align: center; font-weight: bold; color: var(--accent-blue); background-color: rgba(0,210,213,0.03);">${t.P || 0}</td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
 
-            // Oyuncuları Sırala
-            let oyuncularList = [];
-            if (data.oyuncular && typeof data.oyuncular === 'object') {
-                oyuncularList = Object.entries(data.oyuncular).map(([id, stats]) => ({
-                    id, ...stats
+            // Krallıklar Listesi
+            let oyuncularDizisi = [];
+            if(localData.oyuncular) {
+                oyuncularDizisi = Object.entries(localData.oyuncular).map(([id, veri]) => ({
+                    id, ...veri
                 }));
             }
 
-            // Gol Krallığı İlk 3
-            const golList = [...oyuncularList].sort((a,b) => (b.G || 0) - (a.G || 0)).slice(0, 3);
-            const golContainer = document.getElementById('gol-kralligi-list');
-            golContainer.innerHTML = '';
-            golList.forEach((p, idx) => {
-                golContainer.innerHTML += `
-                    <div class="flex items-center justify-between p-2.5 bg-[#1b202e] rounded-lg border border-gray-800/60">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-mono font-bold bg-orange-500/10 text-orange-400 w-5 h-5 flex items-center justify-center rounded">${idx+1}</span>
-                            <span class="font-medium text-sm text-gray-300">${p.id}</span>
-                        </div>
-                        <span class="font-bold font-mono text-orange-400">${p.G || 0} Gol</span>
+            // Gol Krallığı İlk 5
+            const golSiralama = [...oyuncularDizisi].sort((a,b) => (b.G || 0) - (a.G || 0)).slice(0, 5);
+            const golBox = document.getElementById('golKralligiList');
+            golBox.innerHTML = '';
+            golSiralama.forEach((o, index) => {
+                golBox.innerHTML += `
+                    <div style="display: flex; justify-between: space-between; align-items: center; background: #1a1d2e; padding: 10px; border-radius: 4px; border-left: 3px solid var(--accent-red);">
+                        <span style="font-size:13px; font-weight:600; color:#fff;">${index+1}. ${o.id}</span>
+                        <span style="margin-left: auto; font-weight: bold; color: var(--accent-red); font-family: monospace;">${o.G || 0} G</span>
                     </div>
                 `;
             });
 
-            // Asist Krallığı İlk 3
-            const asistList = [...oyuncularList].sort((a,b) => (b.A || 0) - (a.A || 0)).slice(0, 3);
-            const asistContainer = document.getElementById('asist-kralligi-list');
-            asistContainer.innerHTML = '';
-            asistList.forEach((p, idx) => {
-                asistContainer.innerHTML += `
-                    <div class="flex items-center justify-between p-2.5 bg-[#1b202e] rounded-lg border border-gray-800/60">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-mono font-bold bg-purple-500/10 text-purple-400 w-5 h-5 flex items-center justify-center rounded">${idx+1}</span>
-                            <span class="font-medium text-sm text-gray-300">${p.id}</span>
-                        </div>
-                        <span class="font-bold font-mono text-purple-400">${p.A || 0} Asist</span>
+            // Asist Krallığı İlk 5
+            const asistSiralama = [...oyuncularDizisi].sort((a,b) => (b.A || 0) - (a.A || 0)).slice(0, 5);
+            const asistBox = document.getElementById('asistKralligiList');
+            asistBox.innerHTML = '';
+            asistSiralama.forEach((o, index) => {
+                asistBox.innerHTML += `
+                    <div style="display: flex; justify-between: space-between; align-items: center; background: #1a1d2e; padding: 10px; border-radius: 4px; border-left: 3px solid var(--accent-purple);">
+                        <span style="font-size:13px; font-weight:600; color:#fff;">${index+1}. ${o.id}</span>
+                        <span style="margin-left: auto; font-weight: bold; color: var(--accent-purple); font-family: monospace;">${o.A || 0} A</span>
                     </div>
                 `;
             });
-        }
 
-        function setupComparison(oyuncular) {
-            const s1 = document.getElementById('compare-select-1');
-            const s2 = document.getElementById('compare-select-2');
-            
-            Object.keys(oyuncular || {}).sort().forEach(id => {
-                s1.innerHTML += `<option value="${id}">${id}</option>`;
-                s2.innerHTML += `<option value="${id}">${id}</option>`;
+            // Kıyaslama Seçim Listelerini Doldur
+            const s1 = document.getElementById('compareSelect1');
+            const s2 = document.getElementById('compareSelect2');
+            oyuncularDizisi.sort((a,b) => a.id.localeCompare(b.id)).forEach(o => {
+                s1.innerHTML += `<option value="${o.id}">${o.id}</option>`;
+                s2.innerHTML += `<option value="${o.id}">${o.id}</option>`;
             });
 
-            const triggerCompare = () => {
+            const matrisTetikle = () => {
                 const p1 = s1.value;
                 const p2 = s2.value;
                 if(!p1 || !p2) {
-                    document.getElementById('compare-matrix').classList.add('hidden');
+                    document.getElementById('compareResultMatrix').style.display = 'none';
                     return;
                 }
-                
-                document.getElementById('p1-title').innerText = p1;
-                document.getElementById('p2-title').innerText = p2;
-                
-                const data1 = oyuncular[p1];
-                const data2 = oyuncular[p2];
-                
-                const statsToCompare = [
-                    { label: 'Oynadığı Maç (O)', key: 'O' },
-                    { label: 'Goller (G)', key: 'G' },
-                    { label: 'Asistler (A)', key: 'A' },
-                    { label: 'Maçın Oyuncusu (MOTM)', key: 'MOTM' },
-                    { label: 'Pas İsaberi (P)', key: 'P' },
-                    { label: 'Şutlar (S)', key: 'S' },
-                    { label: 'Top Çalma (T)', key: 'T' },
-                    { label: 'Top Kaybı (TK)', key: 'TK' },
-                    { label: 'Interception (INT)', key: 'INT' }
+                document.getElementById('p1Name').innerText = p1;
+                document.getElementById('p2Name').innerText = p2;
+
+                const o1 = localData.oyuncular[p1];
+                const o2 = localData.oyuncular[p2];
+
+                const kriterler = [
+                    { isim: 'Maç (O)', k: 'O' },
+                    { isim: 'Gol (G)', k: 'G' },
+                    { displayName: 'Asist (A)', k: 'A' },
+                    { isim: 'MOTM', k: 'MOTM' },
+                    { isim: 'Pas (P)', k: 'P' },
+                    { isim: 'Şut (S)', k: 'S' },
+                    { isim: 'Top Çalma (T)', k: 'T' },
+                    { isim: 'Top Kaybı (TK)', k: 'TK' },
+                    { isim: 'Kesme (INT)', k: 'INT' }
                 ];
-                
-                const container = document.getElementById('compare-stats-container');
-                container.innerHTML = '';
-                
-                statsToCompare.forEach(stat => {
-                    const val1 = data1[stat.key] || 0;
-                    const val2 = data2[stat.key] || 0;
-                    
-                    let bg1 = "text-gray-300";
-                    let bg2 = "text-gray-300";
-                    
-                    if(stat.key === 'TK') { // Top kaybında az olan iyidir
-                        if(val1 < val2) bg1 = "text-green-400 font-bold";
-                        if(val2 < val1) bg2 = "text-green-400 font-bold";
+
+                const rowsContainer = document.getElementById('compareRows');
+                rowsContainer.innerHTML = '';
+
+                kriterler.forEach(krit => {
+                    const v1 = o1[krit.k] || 0;
+                    const v2 = o2[krit.k] || 0;
+
+                    let c1 = "#fff"; let c2 = "#fff";
+                    if(krit.k === 'TK') {
+                        if(v1 < v2) c1 = "#4cd137"; if(v2 < v1) c2 = "#4cd137";
                     } else {
-                        if(val1 > val2) bg1 = "text-green-400 font-bold";
-                        if(val2 > val1) bg2 = "text-green-400 font-bold";
+                        if(v1 > v2) c1 = "#4cd137"; if(v2 > v1) c2 = "#4cd137";
                     }
-                    
-                    container.innerHTML += `
-                        <div class="grid grid-cols-3 text-center py-2 border-b border-gray-800/40 hover:bg-gray-800/10">
-                            <div class="${bg1} font-mono">${val1}</div>
-                            <div class="text-xs text-gray-400 font-medium">${stat.label}</div>
-                            <div class="${bg2} font-mono">${val2}</div>
+
+                    rowsContainer.innerHTML += `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; font-family: monospace; font-size: 14px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <span style="color: ${c1}; font-weight: bold;">${v1}</span>
+                            <span style="color: var(--text-muted); font-size: 12px;">${krit.isim || krit.displayName}</span>
+                            <span style="color: ${c2}; font-weight: bold;">${v2}</span>
                         </div>
                     `;
                 });
-                
-                document.getElementById('compare-matrix').classList.remove('hidden');
+
+                document.getElementById('compareResultMatrix').style.style.display = 'block';
             };
 
-            s1.addEventListener('change', triggerCompare);
-            s2.addEventListener('change', triggerCompare);
-        }
+            s1.addEventListener('change', matrisTetikle);
+            s2.addEventListener('change', matrisTetikle);
 
-        window.onload = init;
-    </script>
+        } catch(e) {
+            console.error("Hata:", e);
+        }
+    }
+
+    window.onload = verileriYukle;
+</script>
 </body>
 </html>
