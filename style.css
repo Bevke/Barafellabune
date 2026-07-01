@@ -1,0 +1,177 @@
+/* --- Ortak Profesyonel Espor/Futbol Teması --- */
+:root {
+    --bg-darker: #0b0c10;
+    --bg-card: #131520;
+    --text-main: #f5f6fa;
+    --text-muted: #8c92ac;
+    --accent-red: #ff4757;
+    --accent-blue: #00d2d3;
+    --accent-yellow: #feca57;
+    --accent-purple: #a55eea;
+    --border-color: #1e2235;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-darker);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* Header / Navbar */
+header {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--text-main);
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Kahraman (Hero) Bölümü */
+.hero {
+    margin-bottom: 50px;
+    padding: 20px 0;
+}
+.hero h5 {
+    color: var(--accent-red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+.hero p {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 600px;
+}
+
+/* Grid Kart Yapısı (Görseldeki Alan) */
+.database-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.db-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 30px 25px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.db-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Kartların Altındaki O İnce Renkli Çizgiler */
+.db-card.matches { border-bottom: 3px solid var(--accent-blue); }
+.db-card.players { border-bottom: 3px solid var(--accent-orange); }
+.db-card.leagues { border-bottom: 3px solid var(--accent-yellow); }
+.db-card.teams { border-bottom: 3px solid var(--accent-purple); }
+
+.db-card h3 {
+    font-size: 24px;
+    margin: 15px 0 5px 0;
+}
+
+.db-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.db-card .view-link {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Tablo Tasarımları */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.data-table th, .data-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background-color: rgba(255,255,255,0.02);
+    color: var(--text-muted);
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(255,255,255,0.01);
+}
+
+/* Linkler */
+.dynamic-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+.dynamic-link:hover {
+    text-decoration: underline;
+}
