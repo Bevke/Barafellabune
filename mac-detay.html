@@ -2,200 +2,131 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor League - Maç Raporlama Odası</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #0d0f14; color: #e2e8f0; }
-        .cyber-title { font-family: 'Orbitron', sans-serif; }
-    </style>
+    <title>Maç Sonuçları - Editor League</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen">
+<body>
+<header>
+    <div class="logo-area" onclick="window.location.href='index.html'" style="cursor:pointer;">
+        <span>⚽</span> EDITOR LEAGUE DB
+    </div>
+    <div class="nav-links">
+        <a href="index.html">Panel</a>
+        <a href="oyuncu.html">Oyuncu Profili</a>
+        <a href="mac-detay.html" class="active">Maç Detayları</a>
+    </div>
+</header>
 
-    <!-- Navbar -->
-    <nav class="bg-[#111622] border-b border-gray-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-trophy text-yellow-500 text-2xl"></i>
-                    <span class="cyber-title text-xl font-bold tracking-wider bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text text-transparent">EDITOR LEAGUE</span>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="index.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-chart-simple mr-1"></i> Panel</a>
-                    <a href="oyuncu.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-users mr-1"></i> Oyuncu Profili</a>
-                    <a href="mac-detay.html" class="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-file-invoice mr-1"></i> Maç Detayları</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+<div class="container">
+    <div class="hero" style="text-align: center; margin-bottom: 30px;">
+        <h1 id="macSkor">MAÇ GEÇMİŞİ VE DETAYLARI</h1>
+        <p id="macTarih" style="margin: 0 auto; color: var(--text-muted);">Lig Maçları Rapor İstasyonu</p>
+    </div>
 
-    <main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: start;">
         
-        <!-- Manuel Log Giriş Alanı -->
-        <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 space-y-4">
-            <div>
-                <h2 class="cyber-title text-base font-bold text-gray-200"><i class="fa-solid fa-terminal text-blue-500 mr-2"></i> Canlı Bot Çıktısı Ayrıştırıcı</h2>
-                <p class="text-xs text-gray-400 mt-1">Botun attığı MatchStats JSON veya metin verisini buraya yapıştırıp görsel rapora dönüştür moruk.</p>
+        <div style="background-color: var(--bg-card); padding: 20px; border-radius: 4px; border: 1px solid var(--border-color);">
+            <h4 style="color: var(--accent-yellow); margin-bottom: 15px; text-transform: uppercase; font-size: 14px;">Oynanan Maçlar</h4>
+            <div id="macListesiSutun" style="display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 5px;">
+                <p style="color: var(--text-muted); font-size: 13px;">Yükleniyor...</p>
             </div>
-            <textarea id="raw-log-input" rows="4" class="w-full bg-[#1b202e] border border-gray-700 rounded-lg p-3 text-sm font-mono text-green-400 placeholder-gray-600 focus:outline-none focus:border-blue-500" placeholder='{"team1Stats": {...}, "team2Stats": {...}}'></textarea>
-            <button onclick="parseAndRenderLog()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition-colors cursor-pointer w-full sm:w-auto">
-                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Raporu İnşa Et
-            </button>
         </div>
 
-        <!-- Görsel Skor Rapor Ekranı (Gizli Başlar) -->
-        <div id="report-screen" class="hidden space-y-6">
+        <div style="background-color: var(--bg-card); padding: 25px; border-radius: 4px; border: 1px solid var(--border-color);">
+            <h3 id="detayBaslik" style="color: var(--accent-blue); margin-bottom: 20px; font-size: 16px; text-transform: uppercase;">Maç Detayı Raporu</h3>
             
-            <!-- Skor Panosu -->
-            <div class="bg-[#151922] p-6 rounded-2xl border border-gray-800 text-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-red-500/5 pointer-events-none"></div>
-                <div class="grid grid-cols-3 items-center">
-                    <div>
-                        <h2 id="view-t1-name" class="cyber-title text-lg font-bold text-blue-400">TEAM 1</h2>
-                    </div>
-                    <div class="bg-[#0d0f14] py-2 px-4 rounded-xl border border-gray-800 inline-block justify-self-center">
-                        <span id="view-t1-score" class="text-3xl font-extrabold font-mono text-white">0</span>
-                        <span class="text-gray-600 mx-2 text-xl font-mono">-</span>
-                        <span id="view-t2-score" class="text-3xl font-extrabold font-mono text-white">0</span>
-                    </div>
-                    <div>
-                        <h2 id="view-t2-name" class="cyber-title text-lg font-bold text-red-400">TEAM 2</h2>
-                    </div>
-                </div>
+            <div id="secinizUyarisi" style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 40px 0;">
+                Detayları ve oyuncu performans raporunu görmek için sol taraftaki listeden bir maç seç moruk!
             </div>
 
-            <!-- Takım Takım Karşılaştırmalı İstatistikleri -->
-            <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 space-y-4">
-                <h3 class="text-sm font-mono text-gray-400 uppercase tracking-wider text-center border-b border-gray-800 pb-2">Takım Karşılaştırmaları</h3>
-                
-                <div id="team-stats-box" class="space-y-3">
-                    <!-- Dinamik Stat barları basılacak -->
-                </div>
-            </div>
-
-            <!-- Oyuncu Maç İstatistikleri -->
-            <div class="bg-[#151922] p-6 rounded-xl border border-gray-800 space-y-4">
-                <h3 class="text-sm font-mono text-gray-400 uppercase tracking-wider border-b border-gray-800 pb-2"><i class="fa-solid fa-users-rectangle text-indigo-400 mr-2"></i> Maçın Oyuncu Performans Tablosu</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-800 text-gray-400 text-xs font-mono">
-                                <th class="py-2 px-2">Oyuncu</th>
-                                <th class="py-2 px-2">Takım</th>
-                                <th class="py-2 px-2 text-center">G</th>
-                                <th class="py-2 px-2 text-center">A</th>
-                                <th class="py-2 px-2 text-center">Şut</th>
-                                <th class="py-2 px-2 text-center">Pas %</th>
-                                <th class="py-2 px-2 text-center">T.Çalma</th>
-                            </tr>
-                        </thead>
-                        <tbody id="player-match-rows" class="divide-y divide-gray-800/40 text-gray-300">
-                            <!-- Dinamik satırlar -->
+            <div id="raporIcerikAlani" style="display: none;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Oyuncu İsmi</th>
+                            <th style="text-align: center;">Pozisyon</th>
+                            <th style="text-align: center; color: var(--accent-red);">G</th>
+                            <th style="text-align: center; color: var(--accent-purple);">A</th>
+                            <th style="text-align: center; color: var(--accent-yellow);">Puan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="macDetayGövde">
                         </tbody>
-                    </table>
-                </div>
+                </table>
             </div>
-
         </div>
 
-    </main>
+    </div>
+</div>
 
-    <script>
-        function parseAndRenderLog() {
-            const rawData = document.getElementById('raw-log-input').value.trim();
-            if(!rawData) return alert("Log alanı boş bırakılamaz moruk!");
+<script>
+    const API_URL = 'https://bot-lhr2.onrender.com/api/puan-durumu';
+    let ligVerisi = null;
 
-            try {
-                let parsed = JSON.parse(rawData);
-                renderReport(parsed);
-            } catch(e) {
-                alert("Geçersiz JSON formatı! Bot çıktısını eksiksiz yapıştırdığından emin ol.");
+    async function ligMaclariniYukle() {
+        try {
+            const res = await fetch(API_URL);
+            ligVerisi = await res.json();
+
+            const listeKutusu = document.getElementById('macListesiSutun');
+            listeKutusu.innerHTML = '';
+
+            if(!ligVerisi.maclar || ligVerisi.maclar.length === 0) {
+                listeKutusu.innerHTML = `<p style="color: var(--text-muted); font-size:13px;">Henüz maç verisi yok.</p>`;
+                return;
             }
-        }
 
-        function renderReport(data) {
-            document.getElementById('report-screen').classList.remove('hidden');
-
-            const t1 = data.team1Stats || {};
-            const t2 = data.team2Stats || {};
-
-            // Skorları ve İsimleri Bas
-            document.getElementById('view-t1-name').innerText = t1.name || "EV SAHİBİ";
-            document.getElementById('view-t2-name').innerText = t2.name || "DEPLASMAN";
-            document.getElementById('view-t1-score').innerText = t1.goals || 0;
-            document.getElementById('view-t2-score').innerText = t2.goals || 0;
-
-            // Takım Stat Karşılaştırma Listesi
-            const matchStats = [
-                { label: 'Topla Oynama (%)', k1: 'possession', k2: 'possession' },
-                { label: 'Toplam Şut', k1: 'shots', k2: 'shots' },
-                { label: 'İsabetli Şut', k1: 'shotsOnTarget', k2: 'shotsOnTarget' },
-                { label: 'Pas İsabeti', k1: 'passAccuracy', k2: 'passAccuracy' },
-                { label: 'Kornerler', k1: 'corners', k2: 'corners' },
-                { label: 'Fauller', k1: 'fouls', k2: 'fouls' }
-            ];
-
-            const statsBox = document.getElementById('team-stats-box');
-            statsBox.innerHTML = '';
-
-            matchStats.forEach(stat => {
-                const v1 = t1[stat.k1] || 0;
-                const v2 = t2[stat.k2] || 0;
-
-                statsBox.innerHTML += `
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-xs font-mono text-gray-400">
-                            <span class="text-blue-400 font-bold">${v1}</span>
-                            <span>${stat.label}</span>
-                            <span class="text-red-400 font-bold">${v2}</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden flex">
-                            <div class="bg-blue-500 h-full" style="width: ${calculatePercent(v1, v2)}%"></div>
-                            <div class="bg-red-500 h-full flex-1"></div>
-                        </div>
-                    </div>
-                `;
+            // Maçları tersten listeliyoruz (en son maç en üstte gözüksün)
+            ligVerisi.maclar.forEach((mac, index) => {
+                const macBtn = document.createElement('div');
+                macBtn.style.cssText = "background: #1a1d2e; border: 1px solid var(--border-color); padding: 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; transition: 0.2s;";
+                macBtn.innerHTML = `<span style="color:var(--accent-blue);">${mac.ev}</span> <span style="color:var(--text-muted); font-size:11px;">vs</span> <span style="color:var(--accent-purple);">${mac.dep}</span>`;
+                
+                macBtn.onmouseenter = () => macBtn.style.borderColor = "var(--accent-yellow)";
+                macBtn.onmouseleave = () => macBtn.style.borderColor = "var(--border-color)";
+                
+                macBtn.onclick = () => macDetayiniGoster(index);
+                listeKutusu.appendChild(macBtn);
             });
 
-            // Oyuncu Tablosu Basımı
-            const pRows = document.getElementById('player-match-rows');
-            pRows.innerHTML = '';
-
-            // Team 1 Oyuncuları
-            if(data.team1PlayerStats) {
-                Object.entries(data.team1PlayerStats).forEach(([name, st]) => {
-                    pRows.innerHTML += createPlayerRow(name, t1.name || "TAKIM 1", st);
-                });
-            }
-            // Team 2 Oyuncuları
-            if(data.team2PlayerStats) {
-                Object.entries(data.team2PlayerStats).forEach(([name, st]) => {
-                    pRows.innerHTML += createPlayerRow(name, t2.name || "TAKIM 2", st);
-                });
-            }
+        } catch(e) {
+            console.error("Maç listesi yüklenirken hata:", e);
         }
+    }
 
-        function calculatePercent(v1, v2) {
-            const t = parseFloat(v1) + parseFloat(v2);
-            if(t === 0) return 50;
-            return (parseFloat(v1) / t) * 100;
-        }
+    function macDetayiniGoster(index) {
+        if(!ligVerisi || !ligVerisi.maclar[index]) return;
+        
+        const mac = ligVerisi.maclar[index];
+        
+        // Üst başlık skor alanını güncelle
+        document.getElementById('macSkor').innerText = `${mac.ev.toUpperCase()} vs ${mac.dep.toUpperCase()}`;
+        document.getElementById('detayBaslik').innerText = `⚽ Maç İstatistik Matrisi`;
+        
+        document.getElementById('secinizUyarisi').style.display = 'none';
+        document.getElementById('raporIcerikAlani').style.display = 'block';
 
-        function createPlayerRow(name, team, st) {
-            return `
-                <tr class="hover:bg-gray-800/20">
-                    <td class="py-2.5 px-2 font-medium">${name}</td>
-                    <td class="py-2.5 px-2 text-xs text-gray-400">${team}</td>
-                    <td class="py-2.5 px-2 text-center font-mono text-orange-400 font-bold">${st.goals || 0}</td>
-                    <td class="py-2.5 px-2 text-center font-mono text-purple-400">${st.assists || 0}</td>
-                    <td class="py-2.5 px-2 text-center font-mono">${st.shots || 0}</td>
-                    <td class="py-2.5 px-2 text-center font-mono text-emerald-400">${st.passAccuracy || st.P || 0}%</td>
-                    <td class="py-2.5 px-2 text-center font-mono text-red-400">${st.tackles || st.T || 0}</td>
-                </tr>
-            `;
+        const tbody = document.getElementById('macDetayGövde');
+        tbody.innerHTML = '';
+
+        if(mac.detaylar && mac.detaylar.length > 0) {
+            mac.detaylar.forEach(p => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight: 600; color: #fff;">${p.isim}</td>
+                        <td style="text-align: center; font-family: monospace; font-size: 12px; color: var(--text-muted);">${p.mac_pozisyonu || '-'}</td>
+                        <td style="text-align: center; font-weight: bold; color: var(--accent-red);">${p.G || 0}</td>
+                        <td style="text-align: center; font-weight: bold; color: var(--accent-purple);">${p.A || 0}</td>
+                        <td style="text-align: center; font-family: monospace; font-weight: bold; color: var(--accent-yellow);">${p.pso_skor || 0}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Bu maçın detaylı oyuncu istatistiği kaydedilmemiş.</td></tr>`;
         }
-    </script>
+    }
+
+    window.onload = ligMaclariniYukle;
+</script>
 </body>
 </html>
