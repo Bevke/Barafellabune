@@ -2,196 +2,131 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor League - Oyuncu Profili</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #0d0f14; color: #e2e8f0; }
-        .cyber-title { font-family: 'Orbitron', sans-serif; }
-    </style>
+    <title>Oyuncu Profili - Editor League</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen">
+<body>
+<header>
+    <div class="logo-area" onclick="window.location.href='index.html'" style="cursor:pointer;">
+        <span>⚽</span> EDITOR LEAGUE DB
+    </div>
+    <div class="nav-links">
+        <a href="index.html">Panel</a>
+        <a href="oyuncu.html" class="active">Oyuncu Profili</a>
+        <a href="mac-detay.html">Maç Detayları</a>
+    </div>
+</header>
 
-    <!-- Üst Menü / Navbar -->
-    <nav class="bg-[#111622] border-b border-gray-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-trophy text-yellow-500 text-2xl"></i>
-                    <span class="cyber-title text-xl font-bold tracking-wider bg-gradient-to-r from-blue-500 to-indigo-400 bg-clip-text text-transparent">EDITOR LEAGUE</span>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="index.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-chart-simple mr-1"></i> Panel</a>
-                    <a href="oyuncu.html" class="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-users mr-1"></i> Oyuncu Profili</a>
-                    <a href="mac-detay.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"><i class="fa-solid fa-file-invoice mr-1"></i> Maç Detayları</a>
-                </div>
-            </div>
+<div class="container">
+    
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; margin-bottom: 20px; display: flex; align-items: center; justify-between: space-between; gap: 20px;">
+        <span style="font-size: 14px; color: var(--text-muted); font-weight: 600;">PROFİL DEĞİŞTİR:</span>
+        <select id="profileDropdown" style="background: #1c2035; color: #fff; border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 4px; width: 250px;" onchange="window.location.href='oyuncu.html?id=' + this.value">
+            <option value="">Bir Oyuncu Seçin...</option>
+        </select>
+    </div>
+
+    <div id="profilKarti" style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 40px; border-radius: 4px; display: flex; gap: 30px; align-items: center; border-left: 5px solid var(--accent-yellow);">
+        <div id="playerAvatarArea" style="width: 80px; height: 80px; border-radius: 50%; background: #0b0c10; display: flex; align-items: center; justify-content: center; font-size: 44px; overflow: hidden;">
+            🏃‍♂️
         </div>
-    </nav>
-
-    <main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        
-        <!-- Oyuncu Seçim Alanı -->
-        <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-                <h2 class="text-sm font-mono text-gray-400 uppercase">Detaylı İnceleme Sistemleri</h2>
-                <p class="text-xs text-gray-500">Profilini görüntülemek istediğin Editor ligi oyuncusunu listeden seç.</p>
-            </div>
-            <select id="player-selector" class="w-full sm:w-64 bg-[#1b202e] border border-gray-700 rounded-lg p-2.5 text-gray-300 focus:outline-none focus:border-blue-500" onchange="loadPlayerProfile(this.value)">
-                <option value="">Oyuncu Seç...</option>
-            </select>
+        <div>
+            <h1 id="oyuncuAdi" style="font-size: 36px; font-weight: 800;">Oyuncu Seçiniz</h1>
+            <p id="oyuncuTakim" style="color: var(--accent-blue); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">TAKIM BİLGİSİ</p>
+            <p id="oyuncuMevki" style="color: var(--text-muted); font-size: 12px; font-family: monospace; margin-top: 4px;">Mevki: -</p>
         </div>
+    </div>
 
-        <!-- Boş Durum Uyarısı -->
-        <div id="empty-state" class="text-center py-20 bg-[#151922] rounded-xl border border-gray-800 border-dashed">
-            <i class="fa-solid fa-id-card text-5xl text-gray-700 mb-3 animate-bounce"></i>
-            <p class="text-gray-400">Verileri getirmek için yukarıdan bir oyuncu kimliği seç moruk!</p>
+    <h3 style="margin-top: 40px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; font-size: 16px;">📊 Sezon Performans Verileri</h3>
+    <div class="database-grid">
+        <div class="db-card matches" style="text-align: center; padding: 20px;">
+            <p>Toplam Maç (O)</p>
+            <h2 id="pMac" style="font-size: 36px; color: var(--text-main);">0</h2>
         </div>
+        <div class="db-card players" style="text-align: center; padding: 20px;">
+            <p>Goller</p>
+            <h2 id="pGol" style="font-size: 36px; color: var(--text-main);">0</h2>
+        </div>
+        <div class="db-card leagues" style="text-align: center; padding: 20px;">
+            <p>Asistler</p>
+            <h2 id="pAsist" style="font-size: 36px; color: var(--text-main);">0</h2>
+        </div>
+        <div class="db-card teams" style="text-align: center; padding: 20px;">
+            <p>Maçın Oyuncusu (MOTM)</p>
+            <h2 id="pMotm" style="font-size: 36px; color: var(--accent-yellow);">0</h2>
+        </div>
+    </div>
 
-        <!-- Profil Kartı Paneli (Gizli Başlar) -->
-        <div id="profile-panel" class="hidden space-y-6">
-            
-            <!-- Ana Bilgi Kartı -->
-            <div class="bg-gradient-to-br from-[#1c2333] to-[#121722] p-6 rounded-2xl border border-gray-700/60 shadow-xl flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 font-mono text-xs text-gray-600 tracking-wider uppercase" id="player-mevki">FORVET</div>
+    <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; text-align: center;">
+            <span style="font-size: 12px; color: var(--text-muted);">Toplam Pas (P)</span>
+            <div id="pPas" style="font-size: 20px; font-weight: bold; margin-top: 5px; font-family: monospace;">0</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; text-align: center;">
+            <span style="font-size: 12px; color: var(--text-muted);">Toplam Şut (S)</span>
+            <div id="pSut" style="font-size: 20px; font-weight: bold; margin-top: 5px; font-family: monospace;">0</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; text-align: center;">
+            <span style="font-size: 12px; color: var(--text-muted);">Top Çalma (T)</span>
+            <div id="pCalma" style="font-size: 20px; font-weight: bold; margin-top: 5px; font-family: monospace;">0</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; text-align: center;">
+            <span style="font-size: 12px; color: var(--text-muted);">Top Kaybı (TK)</span>
+            <div id="pKayip" style="font-size: 20px; font-weight: bold; margin-top: 5px; font-family: monospace; color: var(--accent-red);">0</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'https://bot-lhr2.onrender.com/api/puan-durumu';
+    const urlParams = new URLSearchParams(window.location.search);
+    const oyuncuId = urlParams.get('id');
+
+    async function oyuncuDetayYukle() {
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            // Açılır menüyü listeyle doldur
+            const dropdown = document.getElementById('profileDropdown');
+            Object.keys(data.oyuncular || {}).sort().forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.innerText = id;
+                if(id === oyuncuId) opt.selected = true;
+                dropdown.appendChild(opt);
+            });
+
+            // Eğer URL parametresi varsa o oyuncunun profilini bas
+            if(oyuncuId && data.oyuncular && data.oyuncular[oyuncuId]) {
+                const oyuncu = data.oyuncular[oyuncuId];
                 
-                <!-- Avatar Sistemi -->
-                <div class="w-24 h-24 rounded-full border-4 border-blue-500/30 bg-[#0d0f14] flex items-center justify-center overflow-hidden shadow-inner shadow-black" id="avatar-container">
-                    <i class="fa-solid fa-user text-4xl text-gray-500"></i>
-                </div>
-
-                <!-- İsim ve Dinamik Rozet Grubu -->
-                <div class="text-center md:text-left space-y-2 flex-1">
-                    <h1 id="player-name" class="cyber-title text-2xl font-bold text-white tracking-wide">Oyuncu Adı</h1>
-                    <p id="player-team" class="text-sm text-blue-400 font-medium"><i class="fa-solid fa-shirt mr-1"></i> Takım Bilgisi Yok</p>
-                    
-                    <!-- Dinamik Rozetler Alanı -->
-                    <div id="badge-area" class="flex flex-wrap gap-2 pt-1 justify-center md:justify-start">
-                        <!-- JS ile unvanlar basılacak -->
-                    </div>
-                </div>
-
-                <!-- Maç & Reyting Büyük Özet -->
-                <div class="flex gap-4 border-t md:border-t-0 md:border-l border-gray-800 pt-4 md:pt-0 md:pl-6 w-full md:w-auto justify-around">
-                    <div class="text-center">
-                        <span class="block text-xs text-gray-400 uppercase font-mono">MAÇ</span>
-                        <span id="stat-big-o" class="text-2xl font-bold font-mono text-gray-200">0</span>
-                    </div>
-                    <div class="text-center">
-                        <span class="block text-xs text-gray-400 uppercase font-mono text-yellow-500">MOTM</span>
-                        <span id="stat-big-motm" class="text-2xl font-bold font-mono text-yellow-500">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detaylı İstatistik Matrisi -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 font-mono uppercase"><i class="fa-solid fa-soccer-ball text-orange-500 mr-1"></i> GOL</span>
-                    <span id="stat-g" class="text-xl font-bold font-mono text-orange-400 mt-1 block">0</span>
-                </div>
-                <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 font-mono uppercase"><i class="fa-solid fa-wand-magic-sparkles text-purple-500 mr-1"></i> ASİST</span>
-                    <span id="stat-a" class="text-xl font-bold font-mono text-purple-400 mt-1 block">0</span>
-                </div>
-                <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 font-mono uppercase"><i class="fa-solid fa-bullseye text-blue-500 mr-1"></i> ŞUT</span>
-                    <span id="stat-s" class="text-xl font-bold font-mono text-blue-400 mt-1 block">0</span>
-                </div>
-                <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 font-mono uppercase"><i class="fa-solid fa-route text-emerald-500 mr-1"></i> PAS İSABETİ</span>
-                    <span id="stat-p" class="text-xl font-bold font-mono text-emerald-500 mt-1 block">0</span>
-                </div>
-                <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 font-mono uppercase"><i class="fa-solid fa-shield text-red-500 mr-1"></i> TOP ÇALMA</span>
-                    <span id="stat-t" class="text-xl font-bold font-mono text-red-400 mt-1 block">0</span>
-                </div>
-                <div class="bg-[#151922] p-4 rounded-xl border border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 font-mono uppercase"><i class="fa-solid fa-triangle-exclamation text-yellow-600 mr-1"></i> TOP KAYBI</span>
-                    <span id="stat-tk" class="text-xl font-bold font-mono text-yellow-600 mt-1 block">0</span>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <script>
-        const API_URL = 'https://bot-lhr2.onrender.com/api/puan-durumu';
-        let database = null;
-
-        async function fetchPlayers() {
-            try {
-                const res = await fetch(API_URL);
-                database = await res.json();
+                document.getElementById('oyuncuAdi').innerText = oyuncu.futbolcu_ismi || oyuncuId;
+                document.getElementById('oyuncuTakim').innerText = oyuncu.takim || 'SERBEST OYUNCU';
+                document.getElementById('oyuncuMevki').innerText = 'Mevki: ' + (oyuncu.mevki || 'Belirtilmemiş');
                 
-                const selector = document.getElementById('player-selector');
-                Object.keys(database.oyuncular || {}).sort().forEach(id => {
-                    selector.innerHTML += `<option value="${id}">${id}</option>`;
-                });
-            } catch(e) {
-                console.error("Profil veritabanı yüklenemedi:", e);
+                // İstatistik Eşlemeleri
+                document.getElementById('pMac').innerText = oyuncu.O || 0;
+                document.getElementById('pGol').innerText = oyuncu.G || 0;
+                document.getElementById('pAsist').innerText = oyuncu.A || 0;
+                document.getElementById('pMotm').innerText = oyuncu.MOTM || 0;
+                
+                document.getElementById('pPas').innerText = oyuncu.P || 0;
+                document.getElementById('pSut').innerText = oyuncu.S || 0;
+                document.getElementById('pCalma').innerText = oyuncu.T || 0;
+                document.getElementById('pKayip').innerText = oyuncu.TK || 0;
+
+                // Discord Avatar Entegrasyonu
+                if(oyuncu.avatar) {
+                    document.getElementById('playerAvatarArea').innerHTML = `<img src="${oyuncu.avatar}" style="width:100%; height:100%; object-cover: cover;">`;
+                }
             }
+        } catch(e) {
+            console.error("Profil datası çekilirken hata oluştu:", e);
         }
+    }
 
-        function loadPlayerProfile(id) {
-            if(!id || !database || !database.oyuncular[id]) {
-                document.getElementById('empty-state').classList.remove('hidden');
-                document.getElementById('profile-panel').classList.add('hidden');
-                return;
-            }
-
-            document.getElementById('empty-state').classList.add('hidden');
-            document.getElementById('profile-panel').classList.remove('hidden');
-
-            const p = database.oyuncular[id];
-
-            // Verileri Yazdır
-            document.getElementById('player-name').innerText = id;
-            document.getElementById('player-team').innerHTML = `<i class="fa-solid fa-shirt mr-1"></i> ${p.takim || 'Serbest Oyuncu'}`;
-            document.getElementById('player-mevki').innerText = p.mevki || 'BİLİNMİYOR';
-            
-            document.getElementById('stat-big-o').innerText = p.O || 0;
-            document.getElementById('stat-big-motm').innerText = p.MOTM || 0;
-            
-            document.getElementById('stat-g').innerText = p.G || 0;
-            document.getElementById('stat-a').innerText = p.A || 0;
-            document.getElementById('stat-s').innerText = p.S || 0;
-            document.getElementById('stat-p').innerText = p.P || 0;
-            document.getElementById('stat-t').innerText = p.T || 0;
-            document.getElementById('stat-tk').innerText = p.TK || 0;
-
-            // Avatar Ayarla
-            const avContainer = document.getElementById('avatar-container');
-            if(p.avatar && p.avatar.startsWith('http')) {
-                avContainer.innerHTML = `<img src="${p.avatar}" alt="${id}" class="w-full h-full object-cover">`;
-            } else {
-                avContainer.innerHTML = `<i class="fa-solid fa-user text-4xl text-gray-500"></i>`;
-            }
-
-            // Rozet Mantığı Ayrıştırma
-            const badgeArea = document.getElementById('badge-area');
-            badgeArea.innerHTML = '';
-
-            if((p.G || 0) >= 5) {
-                badgeArea.innerHTML += `<span class="bg-red-950/50 text-red-400 border border-red-800/60 px-2 py-0.5 rounded text-xs font-semibold"><i class="fa-solid fa-fire mr-1"></i> Gol Makinesi</span>`;
-            }
-            if((p.A || 0) >= 5) {
-                badgeArea.innerHTML += `<span class="bg-purple-950/50 text-purple-400 border border-purple-800/60 px-2 py-0.5 rounded text-xs font-semibold"><i class="fa-solid fa-magic mr-1"></i> Asist Kralı</span>`;
-            }
-            if((p.MOTM || 0) >= 2) {
-                badgeArea.innerHTML += `<span class="bg-yellow-950/50 text-yellow-400 border border-yellow-800/60 px-2 py-0.5 rounded text-xs font-semibold"><i class="fa-solid fa-crown mr-1"></i> Yıldız Oyuncu</span>`;
-            }
-            if((p.T || 0) > (p.TK || 0)) {
-                badgeArea.innerHTML += `<span class="bg-blue-950/50 text-blue-400 border border-blue-800/60 px-2 py-0.5 rounded text-xs font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i> Geçilmez Duvar</span>`;
-            }
-            if(badgeArea.innerHTML === '') {
-                badgeArea.innerHTML = `<span class="bg-gray-800 text-gray-400 px-2 py-0.5 rounded text-xs">Lig Çaylağı</span>`;
-            }
-        }
-
-        window.onload = fetchPlayers;
-    </script>
+    window.onload = oyuncuDetayYukle;
+</script>
 </body>
 </html>
