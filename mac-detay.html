@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Maç Detayı - Editor League</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <div class="logo-area" onclick="window.location.href='index.html'" style="cursor:pointer;">
+        <span>⚽</span> EDITOR LEAGUE DB
+    </div>
+</header>
+
+<div class="container">
+    <div class="hero" style="text-align: center; margin-bottom: 30px;">
+        <h1 id="macSkor">TAKIM A 0 - 0 TAKIM B</h1>
+        <p id="macTarih" style="margin: 0 auto;">Lig Maçı Raporu</p>
+    </div>
+
+    <div style="background-color: var(--bg-card); padding: 30px; border-radius: 4px; border: 1px solid var(--border-color);">
+        <h3 style="color: var(--accent-blue); margin-bottom: 20px;">Maç İstatistikleri & Oyuncu Reytingleri</h3>
+        <!-- Botun attığı ham metni veya log dosyasını buraya basıyoruz -->
+        <pre id="rawLog" style="font-family: 'Courier New', monospace; color: #ced6e0; background: #07080c; padding: 20px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; line-height: 1.5; font-size: 15px; border-left: 4px solid var(--accent-red);">
+Veriler yükleniyor...
+        </pre>
+    </div>
+</div>
+
+<script>
+    // URL'deki maç parametresini al (?id=mac1 gibi)
+    const urlParams = new URLSearchParams(window.location.search);
+    const macId = urlParams.get('id');
+
+    async function macDetayGetir() {
+        if(!macId) {
+            document.getElementById('rawLog').innerText = "Maç bulunamadı.";
+            return;
+        }
+
+        try {
+            // EĞER TXT DOSYASINDAN OKUYACAKSAN:
+            // GitHub'a yüklediğin klasörden çeker. Örn: maclar/mac1.txt
+            const response = await fetch(`maclar/${macId}.txt`);
+            const textData = await response.text();
+            
+            // Log başlığını ve içeriğini sayfaya yediriyoruz
+            document.getElementById('rawLog').innerText = textData;
+            
+            // Skor satırını otomatik text içinden bulup başlığa yazdırmak istersen burayı geliştirebiliriz.
+            document.getElementById('macSkor').innerText = `${macId.toUpperCase()} RAPORU`;
+        } catch (error) {
+            document.getElementById('rawLog').innerText = "Maç raporu yüklenirken hata oluştu.";
+        }
+    }
+
+    window.onload = macDetayGetir;
+</script>
+</body>
+</html>
