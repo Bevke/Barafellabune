@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>TOTW Hub - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; --color-leagues: #eab308; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .week-selector { background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 12px; font-size: 1rem; border-radius: 4px; margin-bottom: 20px; width: 100%; outline: none; cursor:pointer;}
+        
+        .pitch { background: repeating-linear-gradient(0deg, #155e30, #155e30 40px, #14532a 40px, #14532a 80px); border: 3px solid #ffffff80; border-radius: 12px; height: 600px; position: relative; box-shadow: inset 0 0 50px #000; overflow: hidden; animation: fadeIn 0.8s ease;}
+        .pitch::before { content:''; position:absolute; top:50%; left:0; right:0; height:2px; background:#ffffff80; transform:translateY(-50%); }
+        .pitch::after { content:''; position:absolute; top:50%; left:50%; width:120px; height:120px; border:2px solid #ffffff80; border-radius:50%; transform:translate(-50%, -50%); }
+
+        .player-node { position: absolute; text-align: center; transform: translate(-50%, -50%); width: 120px; animation: dropIn 0.5s ease forwards; opacity:0;}
+        .p-avatar { width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--color-leagues); object-fit:cover; margin: 0 auto; box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); transition: transform 0.3s; cursor:pointer;}
+        .player-node:hover .p-avatar { transform: scale(1.2); z-index: 10; position:relative; }
+        .p-name { font-weight: bold; font-size: 0.85rem; margin-top: 8px; text-shadow: 0 2px 4px #000; background:#000000cc; padding:2px 5px; border-radius:4px; display:inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .p-pos { font-size: 0.8rem; color: #fff; font-weight: 800; text-transform: uppercase; margin-top: 2px; text-shadow: 0 1px 3px #000; }
+        
+        .pos-gk  { top: 85%; left: 50%; animation-delay:0.1s;}
+        .pos-lb  { top: 65%; left: 23%; animation-delay:0.2s;}
+        .pos-rb  { top: 65%; left: 77%; animation-delay:0.3s;}
+        .pos-cm  { top: 43%; left: 50%; animation-delay:0.4s;}
+        .pos-lw  { top: 18%; left: 23%; animation-delay:0.5s;}
+        .pos-rw  { top: 18%; left: 77%; animation-delay:0.6s;}
+        
+        @keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
+        @keyframes dropIn { from {opacity:0; transform: translate(-50%, -80%);} to{opacity:1; transform: translate(-50%, -50%);} }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html" class="active">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <select id="week-dropdown" class="week-selector" onchange="renderWeek(this.value)"></select>
+        <div class="pitch" id="pitch"></div>
+    </div>
+
+    <script>
+        let dbData = null;
+        async function buildDropdown() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            dbData = await res.json();
+            
+            let totalWeeks = Math.ceil(dbData.maclar.length / 2);
+            let drop = document.getElementById('week-dropdown');
+            
+            for(let i = totalWeeks; i >= 1; i--) drop.add(new Option(`Haftanın Takımı - Hafta ${i}`, i));
+            renderWeek(totalWeeks);
+        }
+
+        function renderWeek(weekNum) {
+            const pitch = document.getElementById('pitch');
+            pitch.innerHTML = '';
+
+            let startIdx = (weekNum - 1) * 2;
+            let targetMatches = dbData.maclar.slice(startIdx, startIdx + 2);
+            let best = { GK: null, LB: null, RB: null, CM: null, LW: null, RW: null };
+
+            targetMatches.forEach(m => {
+                if(!m.detaylar) return;
+                m.detaylar.forEach(p => {
+                    if(best.hasOwnProperty(p.mac_pozisyonu)) {
+                        if(!best[p.mac_pozisyonu] || p.pso_skor > best[p.mac_pozisyonu].pso_skor) best[p.mac_pozisyonu] = p;
+                    }
+                });
+            });
+
+            Object.entries(best).forEach(([pos, p]) => {
+                if(!p) return;
+                let user = dbData.oyuncular[p.isim] || {};
+                let ovr = Math.min(99, Math.max(50, Math.floor(p.pso_skor / 10)));
+                let avatarImg = user.avatar || 'https://via.placeholder.com/150';
+                let displayName = p.isim || "Bilinmiyor";
+                
+                pitch.innerHTML += `
+                    <div class="player-node pos-${pos.toLowerCase()}" onclick="window.location.href='profile.html?player=${encodeURIComponent(p.isim)}'" title="${displayName}">
+                        <img src="${avatarImg}" class="p-avatar">
+                        <div class="p-name">${displayName}</div>
+                        <div class="p-pos" style="color:var(--color-leagues);">OVR: ${ovr}</div>
+                    </div>`;
+            });
+        }
+        window.onload = buildDropdown;
+    </script>
+</body>
+</html>

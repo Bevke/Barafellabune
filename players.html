@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Players - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .local-search { width: 100%; padding: 15px; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; margin-bottom: 25px; font-size: 1rem; outline: none; transition: 0.3s; }
+        .local-search:focus { border-color: var(--color-players); }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .p-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; border-radius: 6px; transition: transform 0.2s, background 0.3s; animation: fadeIn 0.4s ease forwards; overflow: hidden; }
+        .p-card:hover { transform: translateX(5px); background: #161d2b; }
+        
+        .p-name-container { max-width: 150px; } /* Taşan isimler için sınır */
+        .p-name { font-weight: bold; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-ovr { padding:8px 12px; font-weight:900; border-radius:4px; font-size:1.2rem; flex-shrink: 0; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html" class="active">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <input type="text" id="search" class="local-search" placeholder="Oyuncu ara..." oninput="filter()">
+        <div class="grid" id="target">Yükleniyor...</div>
+    </div>
+
+    <script>
+        let dbData = null;
+        let players = {};
+        
+        // Yeni OVR hesaplama ve Altın/Gümüş renkler
+        function getRank(avgPSO, matchesPlayed) {
+            if(matchesPlayed === 0) return { ovr: 50, color: '#9ca3af', bg: '#374151' }; // Gri (Rookie)
+            
+            // OVR'yi dinamik hesaplamak için formül
+            let ovr = Math.min(99, Math.max(50, 50 + Math.floor(avgPSO / 15)));
+            
+            if(ovr >= 90) return { ovr, color: '#a855f7', bg: 'rgba(168,85,247,0.2)' }; // Mor (Elite)
+            if(ovr >= 80) return { ovr, color: '#3b82f6', bg: 'rgba(59,130,246,0.2)' }; // Mavi (Pro)
+            if(ovr >= 70) return { ovr, color: '#ffd700', bg: 'rgba(255,215,0,0.2)' };   // Altın Sarısı
+            return { ovr, color: '#c0c0c0', bg: 'rgba(192,192,192,0.2)' }; // Gümüş
+        }
+
+        async function load() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            dbData = await res.json(); 
+            players = dbData.oyuncular; 
+            render(players);
+        }
+
+        function render(plist) {
+            const t = document.getElementById('target'); t.innerHTML = '';
+            Object.entries(plist).forEach(([name, p], i) => {
+                
+                // Gerçek pso_skor ortalamasını maçlardan çekelim
+                let totalPso = 0; let mCount = 0;
+                dbData.maclar.forEach(m => {
+                    if(m.detaylar) {
+                        let d = m.detaylar.find(x => x.isim === name);
+                        if(d && d.pso_skor) { totalPso += d.pso_skor; mCount++; }
+                    }
+                });
+                let avgPSO = mCount > 0 ? totalPso / mCount : 0;
+                let rankData = getRank(avgPSO, mCount);
+                
+                let avatar = p.avatar || 'https://via.placeholder.com/150';
+                
+                t.innerHTML += `
+                <a href="profile.html?player=${encodeURIComponent(name)}" class="p-card" style="border-left: 5px solid ${rankData.color}; animation-delay: ${i*0.02}s">
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <img src="${avatar}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid ${rankData.color}; flex-shrink: 0;">
+                        <div class="p-name-container">
+                            <div class="p-name" title="${p.futbolcu_ismi || name}">${p.futbolcu_ismi || name}</div>
+                            <div style="color:var(--text-muted); font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.takim} • ${p.mevki || 'Bilinmiyor'}</div>
+                        </div>
+                    </div>
+                    <div class="p-ovr" style="background:${rankData.bg}; color:${rankData.color};">${rankData.ovr}</div>
+                </a>`;
+            });
+        }
+        function filter() {
+            let q = document.getElementById('search').value.toLowerCase();
+            let f = {}; Object.entries(players).forEach(([n, p]) => { if(n.toLowerCase().includes(q) || (p.futbolcu_ismi||"").toLowerCase().includes(q)) f[n] = p; });
+            render(f);
+        }
+        window.onload = load;
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>News - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; --twitter-blue: #1da1f2;}
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .week-tabs { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
+        .w-btn { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; white-space: nowrap; }
+        .w-btn.active, .w-btn:hover { background: var(--twitter-blue); color: #fff; border-color: var(--twitter-blue); }
+        
+        .tweet-card { background: #000000; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; gap: 15px; animation: fadeIn 0.5s ease; transition: transform 0.2s; cursor: pointer;}
+        .tweet-card:hover { transform: translateY(-2px); background: #05070a; }
+        .t-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); }
+        .t-content { flex: 1; overflow: hidden; }
+        .t-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .t-name { font-weight: bold; font-size: 1rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .t-handle { color: var(--text-muted); font-size: 0.9rem; }
+        .t-text { font-size: 0.95rem; line-height: 1.5; color: #e7e9ea; margin-bottom: 10px; word-wrap: break-word; }
+        .t-tag { color: var(--twitter-blue); font-weight: 600; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html" class="active">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Son Gelişmeler</h2>
+        <div class="week-tabs" id="week-tabs"></div>
+        <div id="tweet-feed">Yükleniyor...</div>
+    </div>
+
+    <script>
+        const journalists = [
+            { ad: "FutbolArena", h: "@futbolarena", av: "https://pbs.twimg.com/profile_images/1626154842765856768/HhM-Hb-__400x400.jpg" },
+            { ad: "Sporx", h: "@sporx", av: "https://pbs.twimg.com/profile_images/1856341705202532353/a3m-q8Jb_400x400.jpg" },
+            { ad: "Yağız Sabuncuoğlu", h: "@yagosabuncu", av: "https://pbs.twimg.com/profile_images/2010809213900001280/bPHdoYNm_400x400.jpg" },
+            { ad: "Fabrizio Romano", h: "@FabrizioRomano", av: "https://pbs.twimg.com/profile_images/1741753635158024192/j0m8Ucvv_400x400.jpg" },
+            { ad: "Editor League", h: "@editorleague", av: "https://i.hizliresim.com/gt5bmq6.png" }
+        ];
+
+        function getJourno() { return journalists[Math.floor(Math.random() * journalists.length)]; }
+
+        async function loadNews() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            const data = await res.json();
+            const weeks = {};
+
+            data.maclar.forEach((mac, idx) => {
+                let hafta = `Hafta ${Math.floor(idx/2)+1}`;
+                if(!weeks[hafta]) weeks[hafta] = [];
+                
+                if(mac.detaylar) {
+                    mac.detaylar.forEach(p => {
+                        let j = getJourno();
+                        
+                        if(p.G >= 3) weeks[hafta].push({ av: j.av, ad: j.ad, h: j.h, pso: p.pso_skor, t: `🚨 İNANILMAZ! ${mac.ev} - ${mac.dep} maçında <b>${p.isim}</b> tam ${p.G} gol atarak hattrick yaptı! Topu evine götürüyor. ⚽🔥 <span class="t-tag">#GoalMachine</span>`, pName: p.isim });
+                        if(p.pso_skor >= 1000) weeks[hafta].push({ av: j.av, ad: j.ad, h: j.h, pso: p.pso_skor, t: `🔥 SON DAKİKA: Uzaylı mısın be adam? <b>${p.isim}</b> bu haftaki maçta ${p.pso_skor} PSO puanı alarak ligin içinden geçti! 👽📈 <span class="t-tag">#ElitePerformance</span>`, pName: p.isim });
+                        if(p.pso_skor > 0 && p.pso_skor < 300 && p.mac_pozisyonu !== 'GK') weeks[hafta].push({ av: j.av, ad: j.ad, h: j.h, pso: p.pso_skor, t: `👀 KULİS BİLGİSİ: <b>${p.isim}</b> sahada adeta yoktu... Sadece ${p.pso_skor} puan ile beklentilerin çok altında bir maç çıkardı. 📉😬 <span class="t-tag">#UnderShock</span>`, pName: p.isim });
+                        
+                        // KALECİ MANTIĞI
+                        if(p.mac_pozisyonu && p.mac_pozisyonu.includes('GK')) {
+                            if(p.K >= 10) weeks[hafta].push({ av: j.av, ad: j.ad, h: j.h, pso: p.pso_skor, t: `🧱 ÖZEL HABER: Kalede tam bir duvar! <b>${p.isim}</b> ${p.K} devasa kurtarış yaparak rakip forvetleri çıldırttı! Büyük takımlar peşinde! 🧤🔥 <span class="t-tag">#BrickWall</span>`, pName: p.isim });
+                            else if(p.K < 5 && p.K > 0) weeks[hafta].push({ av: j.av, ad: j.ad, h: j.h, pso: p.pso_skor, t: `❌ ANALİZ: <b>${p.isim}</b> kalede adeta kova gibiydi. Sadece ${p.K} kurtarış... Kaleye gelen her top gol oldu, acil toparlanması şart! 📉🧤 <span class="t-tag">#DisasterClass</span>`, pName: p.isim });
+                        }
+                    });
+                }
+            });
+
+            renderFeed(weeks);
+        }
+
+        function renderFeed(weeks) {
+            const tabs = document.getElementById('week-tabs');
+            const feed = document.getElementById('tweet-feed');
+            const weekKeys = Object.keys(weeks).reverse();
+            
+            tabs.innerHTML = weekKeys.map((w, i) => `<button class="w-btn ${i===0?'active':''}" onclick="showWk('${w}', this)">${w}</button>`).join('');
+            
+            window.showWk = (w, btn) => {
+                document.querySelectorAll('.w-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                let sortedNews = weeks[w].sort((a,b) => b.pso - a.pso);
+
+                feed.innerHTML = sortedNews.map(tw => `
+                    <div class="tweet-card" onclick="window.location.href='profile.html?player=${encodeURIComponent(tw.pName)}'">
+                        <img src="${tw.av}" class="t-avatar">
+                        <div class="t-content">
+                            <div class="t-header"><span class="t-name">${tw.ad}</span><span class="t-handle">${tw.h}</span></div>
+                            <div class="t-text">${tw.t}</div>
+                        </div>
+                    </div>
+                `).join('') || '<p style="color:var(--text-muted)">Bu hafta kayda değer ekstra bir olay olmadı.</p>';
+            };
+            if(weekKeys.length > 0) showWk(weekKeys[0], tabs.firstChild);
+        }
+        window.onload = loadNews;
+    </script>
+</body>
+</html>

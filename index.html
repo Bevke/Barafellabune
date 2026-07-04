@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDİTOR LEAGUE DASHBOARD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937;
+            --color-matches: #ef4444; --color-players: #3b82f6; --color-leagues: #eab308; --color-teams: #a855f7; --color-elo: #10b981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+
+        .hero { padding: 60px 40px; max-width: 1200px; margin: 0 auto; }
+        .hero-title { font-size: 4rem; font-weight: 900; line-height: 1; letter-spacing: -1px; margin-bottom: 15px; }
+        .hero-desc { color: var(--text-muted); max-width: 600px; font-size: 1rem; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px 40px 40px; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 5px; }
+        .card { background-color: var(--bg-card); padding: 25px; border: 1px solid var(--border-color); border-radius: 4px; text-decoration: none; color: inherit; transition: all 0.3s; }
+        .card:hover { transform: translateY(-3px); background-color: #161d2b; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1 class="hero-title">EDİTOR LEAGUE<br>PRO DASHBOARD</h1>
+        <p class="hero-desc">Bay FC, Oog Fc, Van Parısspor ve Messi FC takımlarının canlı veritabanı, gelişmiş oyuncu metrikleri ve yapay zeka destekli ELO tahmin motoru.</p>
+    </header>
+
+    <main class="container">
+        <div class="cards-grid">
+            <a href="news.html" class="card" style="border-top:3px solid #1da1f2"><h3>News Feed</h3><p>Ligdeki Son Gelişmeler</p></a>
+            <a href="players.html" class="card" style="border-top:3px solid var(--color-players)"><h3>Players</h3><p>Profiller & Reytingler</p></a>
+            <a href="matches.html" class="card" style="border-top:3px solid var(--color-matches)"><h3>Matches</h3><p>Fikstür & Detaylar</p></a>
+            <a href="stats.html" class="card" style="border-top:3px solid var(--color-teams)"><h3>Stats</h3><p>Detaylı Lig Liderleri</p></a>
+            <a href="compare.html" class="card" style="border-top:3px solid #f97316"><h3>Compare</h3><p>H2H Radar Karşılaştırma</p></a>
+            <a href="totw.html" class="card" style="border-top:3px solid var(--color-leagues)"><h3>TOTW</h3><p>Haftalık Taktik Tahtası</p></a>
+            <a href="elo.html" class="card" style="border-top:3px solid var(--color-elo)"><h3>ELO Rankings</h3><p>Takım Güç Sıralamaları</p></a>
+            <a href="standings.html" class="card" style="border-top:3px solid #fff"><h3>Standings</h3><p>Ana Lig Puan Durumu</p></a>
+        </div>
+    </main>
+</body>
+</html>

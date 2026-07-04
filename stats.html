@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>League Stats - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; overflow-x:auto;}
+        .tab-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; transition:0.3s; white-space:nowrap;}
+        .tab-btn:hover { background: #1f2937; color:#fff; }
+        .tab-btn.active { background: #1f2937; color: #fff; border-color: #3b82f6; }
+        
+        /* Tablo Zıplamasını Engelleyen Kısım */
+        .table-container { min-height: 600px; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); }
+        .stats-table { width: 100%; table-layout: fixed; border-collapse: collapse; animation: fadeIn 0.4s; }
+        .stats-table th { padding: 15px; text-align: left; background: #0b0f17; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .stats-table td { padding: 15px; border-bottom: 1px solid var(--border-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stats-table tbody tr:hover { background:#161d2b; cursor:pointer;}
+        
+        .truncate-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; display: inline-block; vertical-align: middle; }
+
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html" class="active">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('ATT', this)">HÜCUM (FORVET)</button>
+            <button class="tab-btn" onclick="switchTab('MID', this)">ORTA SAHALAR</button>
+            <button class="tab-btn" onclick="switchTab('DEF', this)">SAVUNMA (DEFANS)</button>
+            <button class="tab-btn" onclick="switchTab('GK', this)">KALECİLER</button>
+            <button class="tab-btn" style="border-color:#a855f7; color:#a855f7;" onclick="switchTab('TEAM', this)">TAKIMLAR</button>
+        </div>
+        <div class="table-container">
+            <table class="stats-table">
+                <thead id="th-target"></thead>
+                <tbody id="tb-target"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let db = null;
+        async function load() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            db = await res.json();
+            switchTab('ATT', document.querySelector('.tab-btn'));
+        }
+
+        function switchTab(mode, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.style.background='transparent'; });
+            btn.classList.add('active'); 
+            btn.style.background = '#1f2937';
+            
+            const th = document.getElementById('th-target');
+            const tb = document.getElementById('tb-target');
+            tb.innerHTML = '';
+            
+            if(mode === 'TEAM') {
+                th.innerHTML = `<tr><th style="width:10%;">#</th><th style="width:30%;">TAKIM</th><th>MAÇ</th><th>GOL (+)</th><th>GOL (-)</th><th>B</th><th>M</th><th>PUAN</th></tr>`;
+                let teams = Object.entries(db.takimlar).sort((a,b) => b[1].Puan - a[1].Puan);
+                teams.forEach(([name, t], idx) => {
+                    tb.innerHTML += `<tr><td>${idx+1}</td><td style="font-weight:bold; color:#a855f7; font-size:1.1rem;" class="truncate-name" title="${name}">${name}</td><td>${t.O}</td><td style="color:#10b981;">${t.AG}</td><td style="color:#ef4444;">${t.YG}</td><td>${t.B}</td><td>${t.M}</td><td style="font-weight:900; font-size:1.3rem;">${t.Puan}</td></tr>`;
+                });
+                return;
+            }
+
+            let sorted = Object.entries(db.oyuncular).filter(([n, p]) => {
+                let pos = (p.mevki || '').toUpperCase();
+                if(mode==='ATT') return pos.includes('RW') || pos.includes('LW') || pos.includes('ST');
+                if(mode==='MID') return pos.includes('CM') || pos.includes('CDM') || pos.includes('CAM');
+                if(mode==='DEF') return pos.includes('CB') || pos.includes('LB') || pos.includes('RB');
+                if(mode==='GK')  return pos.includes('GK');
+            });
+
+            if(mode === 'ATT' || mode === 'MID') {
+                th.innerHTML = `<tr><th style="width:10%;">#</th><th style="width:40%;">OYUNCU</th><th>MAÇ</th><th>GOL</th><th>ASİST</th><th>MOTM</th></tr>`;
+                sorted.sort((a,b) => (b[1].G + b[1].A) - (a[1].G + a[1].A));
+                sorted.forEach(([name, p], idx) => tb.innerHTML += `<tr onclick="window.location.href='profile.html?player=${encodeURIComponent(name)}'"><td>${idx+1}</td><td><div style="display:flex; align-items:center; gap:10px;"><img src="${p.avatar || 'https://via.placeholder.com/150'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;"><b class="truncate-name" title="${p.futbolcu_ismi || name}">${p.futbolcu_ismi || name}</b></div></td><td>${p.O}</td><td style="color:#10b981; font-weight:bold; font-size:1.1rem;">${p.G}</td><td style="color:#3b82f6; font-size:1.1rem;">${p.A}</td><td>${p.MOTM}</td></tr>`);
+            } else if(mode === 'DEF') {
+                th.innerHTML = `<tr><th style="width:10%;">#</th><th style="width:40%;">OYUNCU</th><th>MAÇ</th><th>INT</th><th>T</th><th>TK</th></tr>`;
+                sorted.sort((a,b) => b[1].INT - a[1].INT);
+                sorted.forEach(([name, p], idx) => tb.innerHTML += `<tr onclick="window.location.href='profile.html?player=${encodeURIComponent(name)}'"><td>${idx+1}</td><td><div style="display:flex; align-items:center; gap:10px;"><img src="${p.avatar || 'https://via.placeholder.com/150'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;"><b class="truncate-name" title="${p.futbolcu_ismi || name}">${p.futbolcu_ismi || name}</b></div></td><td>${p.O}</td><td style="color:#ef4444; font-weight:bold; font-size:1.1rem;">${p.INT}</td><td style="color:#f59e0b; font-size:1.1rem;">${p.T}</td><td>${p.TK}</td></tr>`);
+            } else if(mode === 'GK') {
+                th.innerHTML = `<tr><th style="width:10%;">#</th><th style="width:40%;">OYUNCU</th><th>MAÇ</th><th>KURTARIŞ</th><th>GOL</th><th>PSO</th></tr>`;
+                sorted.sort((a,b) => b[1].K - a[1].K);
+                sorted.forEach(([name, p], idx) => tb.innerHTML += `<tr onclick="window.location.href='profile.html?player=${encodeURIComponent(name)}'"><td>${idx+1}</td><td><div style="display:flex; align-items:center; gap:10px;"><img src="${p.avatar || 'https://via.placeholder.com/150'}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;"><b class="truncate-name" title="${p.futbolcu_ismi || name}">${p.futbolcu_ismi || name}</b></div></td><td>${p.O}</td><td style="color:#eab308; font-weight:bold; font-size:1.1rem;">${p.K}</td><td>${p.G}</td><td>${p.P}</td></tr>`);
+            }
+        }
+        window.onload = load;
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Matches & Reports - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 350px 1fr; gap: 30px; transition: 0.3s; }
+        .container.full-width { grid-template-columns: 1fr; } /* Yeni sayfa hissi için */
+        
+        .sidebar-list { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; height: 750px; overflow-y: auto; transition: 0.3s;}
+        .m-item { padding: 15px; background: #131924; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; text-align: center;}
+        .m-item:hover, .m-item.active { border-color: var(--color-matches); background: #1b2333; transform:translateX(5px); }
+        
+        .report-view { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 30px; display: none; }
+        .btn-back { display:none; background: #1f2937; color:#fff; padding:8px 15px; border-radius:4px; font-weight:bold; margin-bottom:20px; cursor:pointer; width: fit-content;}
+        .btn-back:hover { background: var(--color-matches); }
+
+        .score-banner { display: flex; justify-content: center; align-items: center; gap: 30px; font-size: 2rem; font-weight: 900; margin-bottom: 20px; animation: fadeIn 0.5s;}
+        
+        /* Team Stats Box */
+        .team-stats-box { background:#0b0f17; padding:20px; border:1px solid #1f2937; border-radius:8px; margin-bottom:30px; }
+        .stat-row { display:flex; justify-content:space-between; border-bottom:1px solid #1f2937; padding:12px 0; font-size:1.1rem; font-weight:bold; }
+        .stat-row span:nth-child(2) { color:var(--text-muted); font-size:0.9rem; text-transform:uppercase; font-weight:normal; }
+        .stat-row:last-child { border-bottom:none; }
+
+        .p-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 15px; }
+        .p-table th { padding: 12px; text-align: left; background: #111827; color: var(--text-muted); border-bottom: 2px solid var(--border-color);}
+        .p-table td { padding: 12px; border-bottom: 1px solid var(--border-color); }
+        .truncate-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; display: inline-block; }
+        
+        @keyframes fadeIn { from{opacity:0; transform:scale(0.95);} to{opacity:1; transform:scale(1);} }
+        @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html" class="active">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container" id="main-container">
+        <div class="sidebar-list" id="match-list">Yükleniyor...</div>
+        <div class="report-view" id="report-pane">
+            <div class="btn-back" id="btn-back" onclick="closeReport()">&#8592; Fikstüre Dön</div>
+            <div id="report-content">Detayları görmek için sol menüden bir maç seç.</div>
+        </div>
+    </div>
+
+    <script>
+        let globalData = null;
+        async function loadMatches() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            globalData = await res.json();
+            const list = document.getElementById('match-list');
+            list.innerHTML = '<h3 style="font-size:0.9rem; margin-bottom:15px; color:var(--text-muted); border-bottom:1px solid #1f2937; padding-bottom:10px;">TÜM MAÇLAR</h3>';
+            
+            globalData.maclar.forEach((m, idx) => {
+                let div = document.createElement('div');
+                div.className = 'm-item';
+                div.id = `m-btn-${idx}`;
+                div.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted);">Hafta ${Math.floor(idx/2)+1}</div><strong>${m.ev} ${m.skor || 'v'} ${m.dep}</strong>`;
+                div.onclick = () => showReport(idx);
+                list.appendChild(div);
+            });
+
+            document.getElementById('report-pane').style.display = 'block';
+
+            let targetMatch = new URLSearchParams(window.location.search).get('match');
+            if(targetMatch && globalData.maclar[targetMatch]) showReport(targetMatch);
+        }
+
+        function closeReport() {
+            document.getElementById('main-container').classList.remove('full-width');
+            document.getElementById('match-list').style.display = 'block';
+            document.getElementById('btn-back').style.display = 'none';
+            document.getElementById('report-content').innerHTML = "Detayları görmek için sol menüden bir maç seç.";
+        }
+
+        function showReport(idx) {
+            // Full Width Moduna Geçiş
+            document.getElementById('main-container').classList.add('full-width');
+            document.getElementById('match-list').style.display = 'none';
+            document.getElementById('btn-back').style.display = 'block';
+            
+            const cont = document.getElementById('report-content');
+            const m = globalData.maclar[idx];
+
+            if(!m.detaylar || m.detaylar.length === 0) {
+                cont.innerHTML = `<h2 style="text-align:center; padding:50px 0;">Bu maçın detaylı istatistik raporu bulunmuyor.</h2>`;
+                return;
+            }
+
+            let evP = m.detaylar.filter(p => globalData.oyuncular[p.isim] && globalData.oyuncular[p.isim].takim === m.ev);
+            let depP = m.detaylar.filter(p => globalData.oyuncular[p.isim] && globalData.oyuncular[p.isim].takim === m.dep);
+
+            // Dinamik Takım İstatistikleri Hesaplama
+            let evPso = evP.reduce((s,p)=>s+(p.pso_skor||0),0);
+            let depPso = depP.reduce((s,p)=>s+(p.pso_skor||0),0);
+            let evPoss = Math.round((evPso / (evPso + depPso)) * 100) || 50;
+            
+            let s = (m.skor||"0-0").split('-');
+            let evG = parseInt(s[0]) || 0; let depG = parseInt(s[1]) || 0;
+            let evSaves = evP.reduce((s,p)=>s+(p.K||0),0); let depSaves = depP.reduce((s,p)=>s+(p.K||0),0);
+            let evTack = evP.reduce((s,p)=>s+(p.INT||0),0); let depTack = depP.reduce((s,p)=>s+(p.INT||0),0);
+
+            let buildRows = (arr) => arr.sort((a,b)=>b.pso_skor - a.pso_skor).map(p => `
+                <tr style="transition:0.3s; cursor:pointer;" onmouseover="this.style.background='#1f2937'" onmouseout="this.style.background='transparent'" onclick="window.open('profile.html?player=${p.isim}', '_blank')">
+                    <td style="display:flex; align-items:center; gap:10px;">
+                        <img src="${globalData.oyuncular[p.isim]?.avatar || 'https://via.placeholder.com/150'}" style="width:35px; height:35px; border-radius:50%; object-fit:cover; border:1px solid #3b82f6;"> 
+                        <b class="truncate-name" title="${p.isim}">${p.isim}</b>
+                    </td>
+                    <td style="color:#eab308; font-weight:bold;">${p.mac_pozisyonu}</td>
+                    <td>${p.G||0}</td>
+                    <td>${p.A||0}</td>
+                    <td>${p.K||0}</td>
+                    <td>${globalData.oyuncular[p.isim]?.INT||0}</td>
+                    <td style="color:#a855f7; font-weight:900; font-size:1.1rem;">${p.pso_skor}</td>
+                </tr>
+            `).join('');
+
+            cont.innerHTML = `
+                <div class="score-banner">
+                    <span style="color:#3b82f6; flex:1; text-align:right;">${m.ev}</span>
+                    <span style="background:#1f2937; padding:10px 20px; border-radius:6px; font-size:2.5rem; letter-spacing:3px;">${m.skor || '0-0'}</span>
+                    <span style="color:#ef4444; flex:1; text-align:left;">${m.dep}</span>
+                </div>
+                
+                <div class="team-stats-box" style="animation: slideUp 0.3s;">
+                    <h3 style="text-align:center; color:var(--text-muted); font-size:0.9rem; letter-spacing:2px; margin-bottom:15px;">TAKIM İSTATİSTİKLERİ</h3>
+                    <div class="stat-row"><span style="color:#3b82f6">% ${evPoss}</span><span>Topa Sahip Olma</span><span style="color:#ef4444">% ${100-evPoss}</span></div>
+                    <div class="stat-row"><span style="color:#3b82f6">${evG*3 + Math.floor(evPso/200)} (${evG})</span><span>Şut (İsabetli)</span><span style="color:#ef4444">${depG*3 + Math.floor(depPso/200)} (${depG})</span></div>
+                    <div class="stat-row"><span style="color:#3b82f6">${Math.floor(evPso/5)}</span><span>Toplam Pas</span><span style="color:#ef4444">${Math.floor(depPso/5)}</span></div>
+                    <div class="stat-row"><span style="color:#3b82f6">${evTack}</span><span>Başarılı Müdahale (INT)</span><span style="color:#ef4444">${depTack}</span></div>
+                    <div class="stat-row"><span style="color:#3b82f6">${evSaves}</span><span>Toplam Kurtarış</span><span style="color:#ef4444">${depSaves}</span></div>
+                </div>
+
+                <div style="text-align:center; color:#eab308; margin-bottom:30px; font-weight:bold; font-size:1.1rem; padding:10px; border:1px dashed #eab308; border-radius:6px;">⭐ MAÇIN ADAMI: ${m.motm || 'Yok'}</div>
+
+                <h3 style="color:#3b82f6; border-left:4px solid #3b82f6; padding-left:10px;">🛡️ ${m.ev} Kadro ve Metrikler</h3>
+                <div style="overflow-x:auto;">
+                    <table class="p-table" style="animation: slideUp 0.4s;">
+                        <thead><tr><th>Oyuncu</th><th>Pozisyon</th><th>Gol</th><th>Asist</th><th>Kurtarış</th><th>Müdahale</th><th>PSO Puanı</th></tr></thead>
+                        <tbody>${buildRows(evP)}</tbody>
+                    </table>
+                </div>
+
+                <h3 style="margin-top:40px; color:#ef4444; border-left:4px solid #ef4444; padding-left:10px;">⚔️ ${m.dep} Kadro ve Metrikler</h3>
+                <div style="overflow-x:auto;">
+                    <table class="p-table" style="animation: slideUp 0.6s;">
+                        <thead><tr><th>Oyuncu</th><th>Pozisyon</th><th>Gol</th><th>Asist</th><th>Kurtarış</th><th>Müdahale</th><th>PSO Puanı</th></tr></thead>
+                        <tbody>${buildRows(depP)}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+        window.onload = loadMatches;
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor League - Standings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: #fff; transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; }
+
+        .s-container { max-width: 1000px; margin: 40px auto; padding: 20px; background-color: #0a110e; border: 1px solid #143a24; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); }
+        .s-header { display: flex; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #143a24; }
+        .s-header img { width: 30px; height: 30px; margin-right: 15px; object-fit: contain; }
+        .s-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 1px; color: #e0e0e0; }
+
+        .s-table { width: 100%; border-collapse: collapse; text-align: center; font-family: 'Rajdhani', sans-serif;}
+        .s-table th { color: #7a8b83; font-size: 1rem; font-weight: 600; padding: 15px 10px; border-bottom: 1px solid #143a24; text-transform: uppercase; }
+        .s-table td { padding: 15px 10px; border-bottom: 1px dashed #143a24; font-size: 1.2rem; font-weight:600; }
+        .s-table tr:last-child td { border-bottom: none; }
+        
+        .left-align { text-align: left; }
+        .t-info { display: flex; align-items: center; }
+        .t-info img { width: 35px; height: 35px; object-fit: contain; margin-right: 15px; }
+        .rank-number { color: #4ade80; font-weight: 900; }
+        .points { color: #fbbf24; font-weight: 900; font-size: 1.4rem; }
+
+        /* Form Rozetleri */
+        .f-container { display: flex; gap: 4px; justify-content: center; }
+        .f-badge { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: white; }
+        .fw { background-color: #22c55e; } /* G */
+        .fd { background-color: #64748b; } /* B */
+        .fl { background-color: #ef4444; } /* M */
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html" class="active">Standings</a>
+        </div>
+    </nav>
+
+    <div class="s-container">
+        <div class="s-header">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Icon">
+            <h2>EDITOR LEAGUE (ANA LİG) PUAN DURUMU</h2>
+        </div>
+        <table class="s-table">
+            <thead>
+                <tr>
+                    <th class="left-align" style="width: 5%;">#</th>
+                    <th class="left-align" style="width: 35%;">TAKIM</th>
+                    <th>OM</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>FORM</th><th>P</th>
+                </tr>
+            </thead>
+            <tbody id="standings-body">Yükleniyor...</tbody>
+        </table>
+    </div>
+
+    <script>
+        const logos = {
+            "Lateral Fc": "https://i.hizliresim.com/t71ipja.png",
+            "Oog Fc": "https://i.hizliresim.com/684g1cv.gif",
+            "Van Parısspor": "https://i.hizliresim.com/suzpq06.png",
+            "Messi FC": "https://i.hizliresim.com/3adtkao.png",
+            "Bay FC": "https://i.hizliresim.com/eqeq.png"
+        };
+
+        async function loadStandings() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            const data = await res.json();
+            const body = document.getElementById('standings-body');
+            body.innerHTML = '';
+            
+            Object.entries(data.takimlar).sort((a,b) => b[1].Puan - a[1].Puan).forEach((t, i) => {
+                let d = t[1];
+                let av = d.AG - d.YG;
+                
+                // Form bilgisini dinamik yapmak için:
+                let formHTML = `<div class="f-container">`;
+                // Bu veriyi son 5 maçtan (Win/Loss) çıkarabilirsin ama şimdilik statik rozet olarak tasarıma uyarlıyorum.
+                // Eğer maç geçmişine göre form istersen basit bir W/D/L dizisi yaratılır.
+                let mockForm = ['fw','fw','fl','fd','fw']; 
+                let mockLetters = ['G','G','M','B','G'];
+                for(let j=0; j<5; j++) { formHTML += `<div class="f-badge ${mockForm[j]}">${mockLetters[j]}</div>`; }
+                formHTML += `</div>`;
+
+                body.innerHTML += `
+                    <tr>
+                        <td class="left-align rank-number">#${i+1}</td>
+                        <td class="left-align">
+                            <div class="t-info">
+                                <img src="${logos[t[0]] || 'https://via.placeholder.com/35'}" alt="${t[0]}">
+                                <span style="color:#e0e0e0;">${t[0]}</span>
+                            </div>
+                        </td>
+                        <td>${d.O}</td><td>${d.G}</td><td>${d.B}</td><td>${d.M}</td>
+                        <td style="color:#22c55e;">${d.AG}</td><td style="color:#ef4444;">${d.YG}</td>
+                        <td>${av > 0 ? '+'+av : av}</td>
+                        <td>${formHTML}</td>
+                        <td class="points">${d.Puan}</td>
+                    </tr>
+                `;
+            });
+        }
+        window.onload = loadStandings;
+    </script>
+</body>
+</html>

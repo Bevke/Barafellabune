@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Player Profile - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #aaafb8; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 50px; }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .wrapper { max-width: 1000px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.4s ease; }
+        .btn-back { display:inline-block; background: #1f2937; color:#fff; text-decoration:none; padding:8px 15px; border-radius:4px; font-weight:bold; margin-bottom:20px; transition:0.3s;}
+        .btn-back:hover { background: var(--color-players); }
+
+        .p-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); padding: 30px; border-radius: 8px; margin-bottom: 25px; }
+        .p-title { font-size: 2.5rem; font-weight: 900; }
+        .p-meta { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; line-height: 1.5; }
+        
+        .ovr-box { background: #000; border: 2px solid; padding: 15px 25px; border-radius: 8px; text-align: center; }
+        .ovr-val { font-size: 2.8rem; font-weight: 900; }
+        
+        .section-label { font-size: 0.9rem; font-weight: bold; text-transform: uppercase; color: var(--text-muted); margin: 30px 0 15px 0; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom:5px;}
+        
+        .form-dot { display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-right: 10px; transition:transform 0.2s;}
+        .form-dot:hover { transform: translateY(-3px); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; text-align:center;}
+        .stat-box .val { font-size: 1.8rem; font-weight: 800; margin-top: 8px; }
+        .stat-box .lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
+
+        .chart-container { width: 300px; height: 300px; margin: 0 auto; background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html" class="active">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <a href="players.html" class="btn-back">&larr; Oyunculara Dön</a>
+        <div id="profile-node">Yükleniyor...</div>
+    </div>
+
+    <script>
+        function getRank(avgPSO, matchesPlayed) {
+            if(matchesPlayed === 0) return { ovr: 50, rank: 'ROOKIE', color: '#9ca3af', bg: '#374151' };
+            let ovr = Math.min(99, Math.max(50, 50 + Math.floor(avgPSO / 15)));
+            if(ovr >= 90) return { ovr, rank: 'ELITE', color: '#a855f7', bg: 'rgba(168,85,247,0.2)' };
+            if(ovr >= 80) return { ovr, rank: 'WORLD CLASS', color: '#3b82f6', bg: 'rgba(59,130,246,0.2)' };
+            if(ovr >= 70) return { ovr, rank: 'PRO', color: '#ffd700', bg: 'rgba(255,215,0,0.2)' };
+            return { ovr, rank: 'AMATEUR', color: '#c0c0c0', bg: 'rgba(192,192,192,0.2)' };
+        }
+
+        async function init() {
+            const pName = new URLSearchParams(window.location.search).get('player');
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            const data = await res.json();
+            const p = data.oyuncular[pName];
+            if(!p) { document.getElementById('profile-node').innerHTML = "<h2>Oyuncu bulunamadı.</h2>"; return; }
+
+            let matches = [];
+            let posCounts = {};
+            let totalPso = 0;
+
+            data.maclar.forEach((m, idx) => {
+                if(!m.detaylar) return;
+                let d = m.detaylar.find(x => x.isim === pName);
+                if(d) {
+                    matches.push({ id: idx, opp: m.ev === p.takim ? m.dep : m.ev, score: m.skor, pso: d.pso_skor, pos: d.mac_pozisyonu });
+                    totalPso += d.pso_skor;
+                    posCounts[d.mac_pozisyonu] = (posCounts[d.mac_pozisyonu] || 0) + 1;
+                }
+            });
+
+            let recentForm = matches.slice(-5).reverse();
+            let avgPSO = matches.length > 0 ? (totalPso / matches.length) : 0;
+            let rankData = getRank(avgPSO, matches.length);
+            let avatarImg = p.avatar || 'https://via.placeholder.com/150/111827/ffffff?text=?';
+
+            document.getElementById('profile-node').innerHTML = `
+                <div class="p-header">
+                    <div style="display:flex; gap:25px; align-items:center;">
+                        <img src="${avatarImg}" style="width:120px; height:120px; border-radius:50%; border:4px solid ${rankData.color}; object-fit:cover; box-shadow: 0 0 20px ${rankData.color}60;">
+                        <div>
+                            <h1 class="p-title">${p.futbolcu_ismi || pName}</h1>
+                            <div class="p-meta">Discord: <span style="color:#fff;">@${p.discord_username || pName}</span><br>Kulüp: <span style="color:#fff;">${p.takim}</span></div>
+                            <div style="margin-top:8px; color:${rankData.color}; font-weight:900; letter-spacing:1px; background:${rankData.bg}; display:inline-block; padding:4px 10px; border-radius:4px;">${rankData.rank}</div>
+                        </div>
+                    </div>
+                    <div class="ovr-box" style="border-color:${rankData.color}; box-shadow: 0 0 15px ${rankData.color}40;">
+                        <div class="ovr-val" style="color:${rankData.color};">${rankData.ovr}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:bold;">OVERALL</div>
+                    </div>
+                </div>
+
+                <div class="section-label">Son Maç Performansları (Tıkla ve Maça Git)</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    ${recentForm.length > 0 ? recentForm.map(m => `<a href="matches.html?match=${m.id}" target="_blank" style="text-decoration:none;" title="Rakip: ${m.opp} - Tıkla Maça Git"><div class="form-dot" style="background:#1f2937; color:#fff; border:1px solid ${m.pso>=800?'#10b981':m.pso>=500?'#ffd700':'#ef4444'};">${Math.floor(m.pso/10)}</div></a>`).join('') : '<span style="color:var(--text-muted)">Henüz maç verisi yok</span>'}
+                </div>
+
+                <div class="section-label">Tüm Detaylı İstatistikler</div>
+                <div class="stats-grid">
+                    <div class="stat-box"><div class="lbl">Maç</div><div class="val">${p.O || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">Gol</div><div class="val" style="color:#10b981">${p.G || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">Asist</div><div class="val" style="color:#3b82f6">${p.A || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">Kurtarış</div><div class="val" style="color:#eab308">${p.K || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">Müdahale (INT)</div><div class="val" style="color:#ef4444">${p.INT || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">Top Çalma (T)</div><div class="val">${p.T || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">Kilit Pas (TK)</div><div class="val">${p.TK || 0}</div></div>
+                    <div class="stat-box"><div class="lbl">MOTM</div><div class="val" style="color:#a855f7">${p.MOTM || 0}</div></div>
+                </div>
+                
+                <div class="section-label">Oynadığı Mevki Dağılımı</div>
+                <div class="chart-container">
+                    <canvas id="posChart"></canvas>
+                </div>
+            `;
+
+            if(Object.keys(posCounts).length > 0) {
+                const ctx = document.getElementById('posChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(posCounts),
+                        datasets: [{
+                            data: Object.values(posCounts),
+                            backgroundColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#a855f7', '#6366f1']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+                });
+            }
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>

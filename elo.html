@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>ELO Rankings - EDİTOR LEAGUE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #07090f; --bg-card: #0f141f; --text-main: #ffffff; --text-muted: #6b7280; --border-color: #1f2937; --color-players: #3b82f6; --color-matches: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background-color: #05070a; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-brand img { width: 40px; height: 40px; object-fit: contain; }
+        .nav-brand span { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px; color: #fff; padding-top: 4px; }
+        
+        .search-bar { background-color: #111827; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 4px; width: 250px; outline: none; }
+        .nav-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; position: relative; padding-bottom: 5px; transition: color 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: var(--color-players); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active::after { width: 100%; background-color: var(--color-matches); }
+        
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .info-box { background: #111827; border-left: 4px solid #10b981; padding: 20px; margin-bottom: 30px; font-size: 0.95rem; line-height: 1.6; color: #d1d5db; border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
+        
+        .elo-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px 30px; border-radius: 8px; margin-bottom: 15px; animation: slideIn 0.5s ease forwards; opacity: 0; transform: translateX(-30px); transition:transform 0.2s;}
+        .elo-row:hover { transform: scale(1.02) translateX(0) !important; background: #161d2b;}
+        .t-name { font-size: 1.6rem; font-weight: 900; display:flex; align-items:center; gap:15px;}
+        .rank-num { background:#1f2937; color:#fff; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:1.2rem;}
+        .t-elo { font-size: 2.2rem; font-weight: 900; padding: 5px 20px; border-radius: 8px; background: #000; box-shadow: inset 0 0 10px rgba(255,255,255,0.05);}
+        
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <img src="https://i.hizliresim.com/gt5bmq6.png" alt="Logo">
+            <span>EDİTOR LEAGUE</span>
+        </a>
+        <input type="text" class="search-bar" placeholder="Ara..." disabled style="opacity: 0.5; cursor: not-allowed;">
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="players.html">Players</a>
+            <a href="matches.html">Matches</a>
+            <a href="stats.html">Stats</a>
+            <a href="compare.html">Compare</a>
+            <a href="totw.html">TOTW</a>
+            <a href="elo.html" class="active">ELO</a>
+            <a href="standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="info-box" style="animation: fadeIn 0.5s;">
+            <b style="color:#fff; font-size:1.1rem; display:block; margin-bottom:10px;">📊 ELO Sistemi Nasıl Çalışır? (Gelişmiş Formül)</b>
+            Tüm takımlar sezona taban <b>1000 ELO Puanı</b> ile başlar. <br>
+            🟢 <b>Galibiyet:</b> +20 ELO Puanı <br>
+            🔴 <b>Mağlubiyet:</b> -20 ELO Puanı <br>
+            ⭐ <b>MOTM Bonusu:</b> Eğer Maçın Adamı (MOTM) kazanan takımdansa takıma ekstra <b>+5 ELO</b> eklenir! <br>
+            ⚪ <b>Beraberlik:</b> ELO değişimi olmaz.
+        </div>
+        <div id="elo-board">Yükleniyor...</div>
+    </div>
+
+    <script>
+        function getEloColor(elo) {
+            if (elo >= 1050) return "#00ff00"; // Parlak Yeşil
+            if (elo >= 1020) return "#adff2f"; // Açık Yeşil
+            if (elo >= 1000) return "#ffd700"; // Altın Sarısı
+            if (elo >= 980) return "#ffa500"; // Turuncu
+            return "#ff4444"; // Kırmızı
+        }
+
+        async function calculateELO() {
+            const res = await fetch('https://bot-lhr2.onrender.com/api/puan-durumu');
+            const data = await res.json();
+            
+            let teams = { "Bay FC": 1000, "Lateral Fc": 1000, "Messi FC": 1000, "Oog Fc": 1000, "Van Parısspor": 1000 };
+
+            data.maclar.forEach(m => {
+                if(!m.skor) return;
+                let s = m.skor.split('-').map(x => parseInt(x.trim()));
+                let ev = m.ev, dep = m.dep;
+                
+                if(!teams[ev]) teams[ev] = 1000;
+                if(!teams[dep]) teams[dep] = 1000;
+
+                if(isNaN(s[0]) || isNaN(s[1])) {
+                    if(m.motm === "HÜKMEN") { teams[ev] += 20; teams[dep] -= 20; }
+                    return;
+                }
+
+                if(s[0] > s[1]) { 
+                    teams[ev] += 20; teams[dep] -= 20; 
+                    // MOTM ev sahibindense
+                    if(m.motm && data.oyuncular[m.motm] && data.oyuncular[m.motm].takim === ev) teams[ev] += 5;
+                }
+                else if(s[1] > s[0]) { 
+                    teams[dep] += 20; teams[ev] -= 20; 
+                    if(m.motm && data.oyuncular[m.motm] && data.oyuncular[m.motm].takim === dep) teams[dep] += 5;
+                }
+            });
+
+            let sortedTeams = Object.entries(teams).sort((a,b) => b[1] - a[1]);
+            let board = document.getElementById('elo-board');
+            board.innerHTML = '';
+            
+            sortedTeams.forEach(([name, elo], index) => {
+                let color = getEloColor(elo);
+                board.innerHTML += `
+                    <div class="elo-row" style="animation-delay: ${index * 0.1}s">
+                        <div class="t-name"><span class="rank-num">${index+1}</span> ${name}</div>
+                        <div class="t-elo" style="color: ${color}; border-left: 5px solid ${color};">${elo}</div>
+                    </div>
+                `;
+            });
+        }
+        window.onload = calculateELO;
+    </script>
+</body>
+</html>
